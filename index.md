@@ -10,7 +10,7 @@ You have reached Kai Breucker's website.
 
 ### Tutorials
 
-[**Test**]({% link tutorials/tutorial1/intro.md %}) 
+[**Test**]({% link tutorials/record-gif.md %}) 
 <br>
 Blabla
 
