@@ -66,6 +66,6 @@ Ich habe dafür ein [Feature Request](https://github.com/dvcrn/obsidian-filename
 Für eine externe Lösung habe ich ein [Python-Skript](https://github.com/BonfireAtNight/rename_markdown_files) geschrieben, das Dateinamen automatisch dem Titel anpassen kann.
 Eine Erklärung seines Gebrauchs findet sich auf der GitHub-Seite.
 
-
+## Anmerkungen
 [^1]: Bisher haben nur vier Attribute im Rahmen von Obsidian eine besondere Bedeutung: `tags`, `aliases`, `cssclass` und `publish`. Sollte in der Zukunft ein offizieller Name für Dates festgelegt werden (beispielsweise `Created` stat `date created`) erlaubt es Linter, die Änderungen für alle Dateien auf einen Schlag vorzunehmen.
 [^2]: Für einige einfache Konventionen siehe beispielsweise ["Best practice for naming files in Linux"](https://www.inmotionhosting.com/support/server/linux/best-practice-for-naming-files-in-linux/) oder ein vor kurzem veröffentlichtes [Video](https://www.youtube.com/watch?v=Wu0CxdflECY) von DistroTube. 

@@ -1,5 +1,5 @@
 ---
-title: Contact
+title: Kontakt
 date: 2022-09-28 19:23:13 -0400
 date_last_mod: 2022-10-06 11:22:00 +0200
 ---
