@@ -1,11 +1,11 @@
 ---
 title: Contact
-date: 2022-03-28 19:23:13 -0400
-date_last_mod: 2022-03-29 01:21:49 +0200
+date: 2022-09-28 19:23:13 -0400
+date_last_mod: 2022-10-06 11:22:00 +0200
 ---
-# Contact
-You can reach me by email at [`kai.breucker@gmail.com`](mailto:kai.breucker@gmail.com).
-Other than that, I use various social media platforms:
+# Kontakt
+Für Anregungen, Vorschläge oder andere Anliegen kannst Du mich gerne unter der E-Mail-Adresse [`kai.breucker@gmail.com`](mailto:kai.breucker@gmail.com) kontaktieren.
+Darüber hinaus bin ich auf verschiedenen Social-Media-Plattformen aktiv:
 - [reddit](https://www.reddit.com/user/Punkt_Punkt_Punkt)
 - [Letterboxd](https://letterboxd.com/BonfireAtNight/)
 - [goodreads](https://www.goodreads.com/user/show/117695677-kai)

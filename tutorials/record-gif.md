@@ -217,7 +217,14 @@ Zur Veranschaulichung habe ich einen Screencast davon erstellt, wie man einen mi
 pacman -S screenkey
 pacman -S byzanz
 curl https://raw.githubusercontent.com/edouard-lopez/record-gif.sh/master/record-gif.sh > ~/.bin/recorrd-gif.sh # oder in einem anderen Verzeichnis für Binaries
+
+# Installation von xrectsel über AUR
+cd ~/builds
+git clone https://aur.archlinux.org/xrectsel.git
+cd xrectsel
+makepkg -si
 ```
 
+## Anmerkungen
 [^1]: Auf der verlinkten Online-Version der `man`-Page wird die Option `-e` bzw. `--execute` nicht genannt, wohl aber in der lokalen Version. Ich konnte nicht  in Erfahrung bringen, ob es sich dabei um eine Nachlässigkeit handelt oder ob verschiedene Releases von Byzanz im Umlauf sind, die sich in ihren Features unterscheiden. 
 [^2]: Die doppelten Anführungszeichen sind wichtig, falls dem Befehl selbst wiederum Argumente übergeben werden. Der gesamte `byzanz-record`-Befehl wird von der Shell in mehreren Schritten interpretiert, bevor das Programm aufgerufen wird. In einem Schritt werden die Argumente [separiert](https://www.gnu.org/software/bash/manual/bash.html#Word-Splitting). Als ein *Wort* werden für gewöhnlich (sofern die `IFS`-Umgebungsvariable nicht neu definiert wird) Zeichenketten zwischen Leerzeichen aufgefasst. Im Rahmen des Byzanz-Aufrufs sollen nun jedoch mehrere Wörter *ein* Argument bilden, die auf der tieferen Ebene die verschiedenen Argumente eines anderen Befehls sind. Im Befehl `byzanz-record -e "echo Hello World"` ist `echo Hello World` *ein* Argument; der Befehl bewirkt jedoch, dass `echo Hello World` in einer neuen Subshell aufgerufen wird, und dann sind `Hello` und `World` zwei Argumente des `echo`-Befehls.    
