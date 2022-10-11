@@ -4,13 +4,6 @@ date: 2022-09-28 14:16:32 +0200
 date_last_mod: 2022-09-28 18:29:21 +0200
 ---
 
-<h1 style="text-align: left;">Welcome</h1>
+<h1 style="text-align: left;">Willkommen</h1>
 
-You have reached Kai Breucker's website.
-
-### Tutorials
-
-[**Test**]({% link tutorials/record-gif.md %}) 
-<br>
-Blabla
-
+Dies ist die persönliche Website von Kai Breucker.

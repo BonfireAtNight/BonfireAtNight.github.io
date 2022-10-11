@@ -6,6 +6,9 @@ date_last_mod: 2022-10-11 16:05:49 +0200
 # Tutorials
 
 ## Obsidian
-- [**Titel und Dateinamen in Obsidian]({% link tutorials/obsidian/obsidian_filename_title.md %})
+- [**Titel und Dateinamen in Obsidian**]({% link tutorials/obsidian/obsidian_filename_title.md %})
 
 ## (Neo)Vim
+
+## Linux
+- [**Wie man GIF-Screencasts aufnimmt**]({% link tutorials/record-gif.md %}) 
