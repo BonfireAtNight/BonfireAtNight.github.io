@@ -12,7 +12,7 @@ date_last_mod: 2022-09-29 01:21:49 +0200
 ### Stochastik
 
 #### Zufallsexperimente
-- [**Einleitung**]({% link theory/kurse/stochastik/zufallsexperimente/zufallsexperimente_einleitung.md %})
+- [**Einleitung**]({% link theory/disziplinen/stochastik/zufallsexperimente/zufallsexperimente_einleitung.md %})
 
 
 <!-- ## Spitzfindigkeiten -->
