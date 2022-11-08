@@ -63,6 +63,19 @@ Selbst im Rahmen *eines* logischen Systems kann ein und dieselbe Aussage durch v
 Diesen Umstand sollten wir uns zunutze machen: Häufig empfiehlt es sich, Aussagen anhand äquivalenter logischer Formen umzudeuten
 Der Vorteil liegt darin, dass dadurch Beweisstrategien anwendbar werden, die auf den ersten Blick nicht anwendbar erschienen.
 
+## Beweisstrategien
+Es ist in der Mathematik und Informatik – und sicher auch in anderen Bereichen – üblich, dass Probleme *transformiert* werden, um sie besser (oder überhaupt) lösen zu können (Velleman 2006, 86-87).
+Da es dabei vielfach nicht mehr um die Hypothesen und Konklusion des Theorems geht, wie sie üblicherweise (oder zunächst) vorgebracht werden, sollten diese Wörter bei unseren Überlegungen zu einer möglichen Lösung vielleicht zunächst besser vermieden werden.
+Velleman (2006, 88) schlägt vor, vom *Gegebenen* (*the givens*) und dem *Ziel* (*goals*) zu sprechen, den "statements that are known or assumed to be true at some point in the course of figuring out a proof" und dem "statement that remains to be proven at that point".
+Sie ergeben sich also nach der Transformation - oder den schrittweise durchgeführten Transformtionen - des ursprünglichen Problems und es ist ihre logische Form, die entscheidend ist.
+
+Zunächst handelt es sich bei den gegebenen Aussagen um die Hypothesen des Theorems, allerdings kommen durch Schlussfolgerungen und Transformationen des Problems (insbesondere durch *Annahmen*) weitere Aussagen hinzu.
+Die Zielaussage drückt zunächst die Konklusion des Theorems aus, kann sich jedoch im Zuge unserer Vorabüberlegungen mehrfach ändern.
+
+### Beweis einer Zielaussage der Form: P -> Q
+
+#### Implikationseinführung nach Annahme der Antezedenz
+
 ## Anmerkungen
 [^1]: Eine bemerkenswerte Ausnahme sind die Theoreme der Aussagenlogik, die häufig mittels Wahrheitstafeln begründet werden können.
 [^2]: Wie bei Argumenten und Argumentationen allgemein, so kann man auch bezüglich Beweisen eine Unterscheidung treffen zwischen dem *Akt* des Beweisens und dem, was dabei zum Ausdruck gebracht wird. Anders ausgedrückt, Beweisen als illokutionäre Rolle (*illocutionary force*) einer Äußerung ist abzugrenzen vom Beweis als semantischer Gehalt der Äußerung. Vgl. Brandom ().
@@ -71,4 +84,5 @@ Der Vorteil liegt darin, dass dadurch Beweisstrategien anwendbar werden, die auf
 [^5]: Mittels einer Argumentform und seiner Gültigkeit oder Ungültigkeit wird etwas *über* ein logisches System gesagt. Technisch korrekt ist es deshalb, sie mithilfe von *Metavariablen* zu beschreiben und darauf hinzuweisen, dass die Operatoren genau genommen zu unterscheiden sind von denjenigen der Objektsprache selbst. Die Formeln der Objektsprache *instanziieren* die Formeln der Metasprache. So wird die Formel $\phi \lor \psi$ beispielsweise durch die aussagenlogische Formel $P_1 \lor P_2$ instanziiert. Diese technischen Details werden in diesem Artikel keine Rolle spielen.
 [^6]: Tatsächlich kann die Oberflächenstruktur einer Aussage irreführend sein. (...)
 [^7]: Wenn der Beweis letztlich in sauberer Form geschrieben wird, werden logische Symbole von vielen als störend empfunden (Velleman 2006, 92). Beweise werden in ihrer finalen Form deshalb meist weitgehend in natürlicher Sprache und ohne mathematische Notation formuliert.
-[^8]: Für unsere Zwecke reicht es völlig aus, Aussagenvariablen, Junktoren und Quantoren in ihrer gewöhnlichen Bedeutung zu verwenden, statt die zugrundegelegte Logik dadurch zu formalisieren, dass explizit die Syntax und Semantik einer Sprache erster Ordnung definiert würde.
+[^8]: Für unsere Zwecke reicht es völlig aus, Aussagenvariablen, Junktoren und Quantoren in ihrer gewöhnlichen Bedeutung zu verwenden, statt die zugrundegelegte Logik dadurch zu formalisieren, dass explizit die Syntax und Semantik einer Sprache erster Ordnung definiert würde. In einem formalisierten deduktiven System werden neben der Sprache auch die Schlussregeln (rules of inference) definiert, doch auch davon sehen wir hier ab. Stattdessen wenden wir intuitiv Regeln eines Kalküls des natürlichen Schließens an.
+[^9]: Im Englischen wird zwischen *assertion* und *assumption* unterschieden: "To assert a statement is to claim that it is true, and such a claim is never acceptable in a proof unless it can be justified. However, the purpose of making an assumption in a proof is not to make a claim about what *is* true, but rather to enable you to find out what *would be* true *if* the assumption were correct." (Velleman 2006, 87) Der letztgenannte Begriff wird im Deutschen zumeist durch *Annahme* ausgedrückt (Quelle???). Wenn Aussagen als wahr vorgetragen werden, kann dem Sprechakt in einigen Fällen die illokutionäre Rolle einer *Behauptung* zugeschrieben werden (Frege XXX). Der semantische Gehalt eines solchen Sprechakts scheint mir damit aber nicht treffend beschrieben. Aus Mangel an einer besseren Idee verwende ich deshalb *Assertion* als wäre es ein deutsches Wort.
