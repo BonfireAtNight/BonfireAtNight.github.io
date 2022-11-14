@@ -11,4 +11,4 @@ date_last_mod: 2022-10-11 16:05:49 +0200
 ## (Neo)Vim
 
 ## Linux
-- [**Wie man GIF-Screencasts aufnimmt**]({% link tutorials/record-gif.md %}) 
+- [**Wie man GIF-Screencasts aufnimmt**]({% link tutorials/linux/record-gif.md %}) 
