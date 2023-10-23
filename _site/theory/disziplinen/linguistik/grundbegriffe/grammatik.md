@@ -1,1 +1,0 @@
-# Grammatiken und ihre Formalisierung

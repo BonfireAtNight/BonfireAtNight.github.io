@@ -1,1 +1,0 @@
-"Whenever we use pictures in R2 or use the somewhat vague language of points and vectors, remember that these are just aids to our understanding, not substitutes for the actual mathematics that we will develop." (*Linear Algebra Done Right*, 8)

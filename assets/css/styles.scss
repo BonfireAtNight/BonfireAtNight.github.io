@@ -1,8 +1,9 @@
 ---
 ---
-@import "colors";
+// Note: Additional styles are taken from the _sass directory
+@import "colors", "topnav", "date-nav", "syntax-one-dark";
 
-// Note: body text and background color
+// Body text and background color
 body {
   line-height: 1.5;
   color: $text-color;
@@ -13,7 +14,7 @@ body {
   word-wrap: break-word;
 }
 
-// Note: markdown body
+// Markdown body
 // -----------------------------------------------
 .markdown-body {
   line-height: inherit;
@@ -61,7 +62,7 @@ body {
 }
 // -----------------------------------------------
 
-// Element: headers
+// Element: Headings
 // -----------------------------------------------
 .markdown-body h1,
 .markdown-body h2,
@@ -79,7 +80,6 @@ body {
   font-size: 2.00em;
   padding-bottom: .3em;
   text-align: center;
-  // border-bottom: 1px solid $border-color;
 }
 
 .markdown-body h2 {
@@ -105,7 +105,7 @@ body {
 }
 // -----------------------------------------------
 
-// Element: links
+// Element: Links
 // -----------------------------------------------
 .markdown-body a {
   color: $link-color;
@@ -137,7 +137,7 @@ body {
 }
 // -----------------------------------------------
 
-// Element: details and summary
+// Element: Details and summary
 // -----------------------------------------------
 .markdown-body details {
   background-color: $light2;
@@ -158,7 +158,7 @@ body {
 }
 // -----------------------------------------------
 
-// Element: input
+// Element: Input
 // -----------------------------------------------
 .markdown-body input {
   overflow: visible;
@@ -170,7 +170,7 @@ body {
 }
 // -----------------------------------------------
 
-// Element: horizontal rule
+// Element: Horizontal rule
 // -----------------------------------------------
 .markdown-body hr {
   height: .25ex;
@@ -196,7 +196,7 @@ body {
 }
 // -----------------------------------------------
 
-// Element: block quotes
+// Element: Block quotes
 // -----------------------------------------------
 .markdown-body blockquote {
   margin: 0;
@@ -207,7 +207,7 @@ body {
 }
 // -----------------------------------------------
 
-// Element: lists and list items
+// Element: Lists and list items
 // -----------------------------------------------
 .markdown-body ol,
 .markdown-body ul {
@@ -243,7 +243,7 @@ body {
 }
 // -----------------------------------------------
 
-// Element: description list, details, term
+// Element: Description list, details, term
 // -----------------------------------------------
 .markdown-body dl {
   padding: 0;
@@ -267,7 +267,7 @@ body {
 }
 // -----------------------------------------------
 
-// Element: tables
+// Element: Tables
 // -----------------------------------------------
 .markdown-body table {
   display: block;
@@ -281,26 +281,26 @@ body {
   font-weight: 600;
 }
 
-// Note: table border color
+// Note: Table border color
 .markdown-body table td,
 .markdown-body table th {
   padding: 6px 13px;
   border: 1px solid $table-border-color;
 }
 
-// Note: table row background color 1
+// Note: Table row background color 1
 .markdown-body table tr {
   background-color: $table-row-color-light;
   border-top: 1px solid #c6cbd1;
 }
 
-// Note: table row background color 2
+// Note: Table row background color 2
 .markdown-body table tr:nth-child(2n) {
   background-color: $table-row-color-dark;
 }
 // -----------------------------------------------
 
-// Element: image
+// Element: Image
 // -----------------------------------------------
 .markdown-body img {
   max-width: 100%;
@@ -318,7 +318,7 @@ body {
 }
 // -----------------------------------------------
 
-// Element: keyboard
+// Element: Keyboard
 // -----------------------------------------------
 .markdown-body kbd {
   display: inline-block;
@@ -334,11 +334,11 @@ body {
 }
 // -----------------------------------------------
 
-// Element: code, highlight, pre, etc
+// Element: Code, highlight, pre, etc
 // -----------------------------------------------
 .markdown-body code,
 .markdown-body pre {
-  font-family: 'Computer Modern Typewriter',monospace;
+  font-family: 'Computer Modern Typewriter', monospace;
 }
 
 .markdown-body pre {
@@ -402,7 +402,7 @@ body {
 }
 // -----------------------------------------------
 
-// Media queries
+// Settings for smaller devices
 // -----------------------------------------------
 @media (max-width: 767px) {
   .markdown-body {
@@ -410,5 +410,3 @@ body {
   }
 }
 // -----------------------------------------------
-
-@import "topnav", "date-nav", "nord-syntax";
