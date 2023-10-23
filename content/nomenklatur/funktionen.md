@@ -44,6 +44,11 @@ Während eines Aufrufs kann eine Subroutine mehrfach *aktiviert* werden.[^13] Di
 - In vielen Programmiersprachen fungieren Subroutinenaufrufe als Ausdrücke. Diese Verwendungsweise liegt insbesondere bei Funktionen nahe.
 - Rekursive Subroutinen zeichnen sich dadurch aus, dass sie sich selbst aufrufen. Bei der Ausführung einer solchen Routine wird sie mehrfach *aktiviert*.
 
+## Literatur
+Franěk, Frantisek. 2004. Memory as a Programming Concept in C and C++. Cambridge: Cambridge University Press.
+Scott, Michael Lee. 2016. Programming Language Pragmatics. 4. Aufl. Waltham, MA: Morgan Kaufmann.
+Strachey, Christopher. 2000. „Fundamental Concepts in Programming Languages“. Higher-Order and Symbolic Computation 13 (1/2): 11–49. https://doi.org/10.1023/A:1010000313106.
+
 ## Fußnoten
 [^1]: Bei Argumenten denkt man an etwas, das in Diskussionen oder ähnlichen Auseinandersetzungen vorgebracht wird, um eine Äußerung oder Annahme zu untermauern. Natürlich hat die Verwendung dieses Wortes in der Informatik historische Gründe. Wie das Wort in der Alltagssprache so hat auch das Wort in der Informatik seinen Ursprung in der Rede über logische Zusammenhänge. In einem [Thread auf StackExchange](https://softwareengineering.stackexchange.com/questions/186293/why-are-actual-parameters-called-arguments) werden einige plausible Spekulationen und interessante Quellen angeführt.
 [^2]: Die Ausdrücke *actual parameter* und *formal parameter* gehören zum Standardvokabular bei der Rede über Funktionen. Vgl. beispielsweise Scott 2016, 411.
@@ -58,8 +63,3 @@ Während eines Aufrufs kann eine Subroutine mehrfach *aktiviert* werden.[^13] Di
 [^11]: Für C siehe https://learn.microsoft.com/en-us/cpp/c-language/function-call-c?view=msvc-170. Für Python siehe https://docs.python.org/2/reference/expressions.html#calls.
 [^12]: Leider weiß ich nichts Näheres über die genaue Implementierung in verschiedenen Sprachen. In Sprachen, in denen Anweisungen durch das Semikolon abgeschlossen werden, ist die syntaktische Form von `f(x);` vielleicht als Anweisung definiert, während eine Verwendung ohne Semikolon einen Ausdruck auszeichnet.
 [^13]: Vgl. Franěk 2004, 77.
-
-## Literatur
-Franěk, Frantisek. 2004. Memory as a Programming Concept in C and C++. Cambridge: Cambridge University Press.
-Scott, Michael Lee. 2016. Programming Language Pragmatics. 4. Aufl. Waltham, MA: Morgan Kaufmann.
-Strachey, Christopher. 2000. „Fundamental Concepts in Programming Languages“. Higher-Order and Symbolic Computation 13 (1/2): 11–49. https://doi.org/10.1023/A:1010000313106.

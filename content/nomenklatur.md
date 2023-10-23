@@ -11,3 +11,6 @@ In Dokumentationen und Referenzhandbüchern findet sich häufig so etwas wie die
 In den Artikeln dieser Kategorie möchte ich einen Überblick darüber geben, wie besonders gängige Konzepte der Informatik in verschiedenen Kontexten bezeichnet werden. In einen Fällen mache ich einen Vorschlag, welche Redeweise vielleicht am sachgemäßesten ist. Oder mir zumindest am wenigsten irreführend erscheint.
 
 Dabei geht es mir nicht über eine detaillierte Darstellung der Sachgebiete, die durch die Begriffe bezeichnet werden. Es wird nur um Wörter gehen, um möglichst präzise einzelne Aspekte einer bereits vertrauten Materie zu bezeichnen.
+
+## Index
+- [**Funktionen**]({% link content/nomenklatur/funktionen.md %})
