@@ -1,46 +1,33 @@
-$nord0: #2e3440;
-$nord1: #3b4252;
-$nord2: #434c5e;
-$nord3: #4c566a;
-$nord3_bright: #616E88;
+$one-dark-background: #282c34;
+$one-dark-current-line: #353b45;
+$one-dark-selection: #3e4451;
+$one-dark-foreground: #abb2bf;
+$one-dark-comment: #5c6370;
 
-$nord4: #d8dee9;
-$nord5: #e5e9f0;
-$nord6: #eceff4;
+$one-dark-cyan: #56b6c2;
+$one-dark-green: #98c379;
+$one-dark-orange: #d19a66;
+$one-dark-pink: #c678dd;
+$one-dark-purple: #c678dd;
+$one-dark-red: #e06c75;
+$one-dark-yellow: #e5c07b;
 
-$nord7: #8fbcbb;
-$nord8: #88c0d0;
-$nord9: #81a1c1;
-$nord10: #5e81ac;
+$text-color: $one-dark-foreground;
+$background-color: $one-dark-background;
+// $link-color: $one-dark-cyan;
+$link-color: $one-dark-green;
+$border-color: $one-dark-selection;
 
-$nord11: #bf616a;
-$nord12: #d08770;
-$nord13: #ebcb8b;
-$nord14: #a3be8c;
-$nord15: #b48ead;
+// $inline-code-text-color: $one-dark-foreground;
+$inline-code-text-color: $one-dark-yellow;
+//$inline-code-background-color: $one-dark-background;
+$inline-code-background-color: $one-dark-current-line;
+$block-code-text-color: $one-dark-foreground;
+$block-code-background-color: $one-dark-current-line;
 
-$light0: #fbfbfc;
-$light1: #f8f9fb;
-$light2: #f3f4f6;
-$link-blue: #0079c0;
-// -----------------------------------------------
+$quote-text-color: $one-dark-comment;
+$quote-background-color: $one-dark-background;
 
-// Semantically-named colors
-// -----------------------------------------------
-$text-color: $nord1;
-$background-color: $light0;
-$link-color: $link-blue;
-$border-color: $nord4;
-
-$inline-code-text-color: $nord1;
-$inline-code-background-color: $nord5;
-$block-code-text-color: $nord4;
-$block-code-background-color: $nord0;
-
-$quote-text-color: $nord3;
-$quote-background-color: $light2;
-
-$table-row-color-light: $background-color;
-$table-row-color-dark: $light2;
-$table-border-color: $nord4;
-// -----------------------------------------------
+$table-row-color-light: $one-dark-background;
+$table-row-color-dark: $one-dark-current-line;
+$table-border-color: $one-dark-foreground;

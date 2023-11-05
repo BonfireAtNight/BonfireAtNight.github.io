@@ -79,7 +79,7 @@ body {
 .markdown-body h1 {
   font-size: 2.00em;
   padding-bottom: .3em;
-  text-align: left;
+  text-align: center;
 }
 
 .markdown-body h2 {
@@ -140,7 +140,7 @@ body {
 // Element: Details and summary
 // -----------------------------------------------
 .markdown-body details {
-  background-color: $background-color;
+  background-color: $light2;
   display: block;
 }
 
@@ -290,7 +290,7 @@ body {
 
 // Note: Table row background color 1
 .markdown-body table tr {
-  background-color: $background-color;
+  background-color: $table-row-color-light;
   border-top: 1px solid #c6cbd1;
 }
 
