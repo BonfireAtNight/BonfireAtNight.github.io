@@ -298,7 +298,7 @@ Für diese Artikel habe ich primär drei Quellen verwendet, die im [NixOS & Flak
 [Nix, A One-Pager \(tazjin auf GitHub\)](https://github.com/tazjin/nix-1p){:target="_blank"}<br>
 [Die offizielle Dokumentation](https://nixos.org/manual/nix/stable/language/){:target="_blank"}<br>
 
-In einer früheren Version habe ich in Fußnoten gezielt auf die Abschnitte verwiesen, aus denen ich Informationen oder Beispiele entnommen habe. Ich denke es ist eine vertretbare (und weit verbreitete) Praxis bei einem Thema wie diesem nur allgemein auf die Seiten zu verweisen, statt Schuldigkeiten im einzelnen auszuweisen. So konnte die Fülle an Fußnoten vermieden werden.
+In einer früheren Version habe ich in Fußnoten gezielt auf die Abschnitte verwiesen, aus denen ich Informationen oder Beispiele entnommen habe. Ich denke es ist eine vertretbare und weit verbreitete Praxis bei einem Thema wie diesem nur allgemein auf die genutzten Seiten zu verlinken, statt Schuldigkeiten im einzelnen auszuweisen. So kann wenigstens die Fülle an Fußnoten vermieden werden.
 
 ## Literatur
 Dolstra, Eelco. 2006. The Purely Functional Software Deployment Model. Utrecht: Utrecht University.<br>
