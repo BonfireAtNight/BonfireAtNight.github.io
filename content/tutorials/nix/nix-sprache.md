@@ -318,5 +318,5 @@ Scott, Michael Lee. 2016. Programming Language Pragmatics. 4. Aufl. Waltham, MA:
 [^9]: Es gibt einige wenige Funktionen, die ohne Argument aufgerufen werden können (*nullary functions*). `true`, `false` und `null` wurden bereits angeführt.
 [^10]: Die andere zentrale Umformungsoperation des Lambdakalküls, die Alpha-Conversion genannt wird und durch die gebundene Variablen umbenannt werden, spielt in Nix keine große Rolle.
 [^11]: Haskell Curry hat die Methodik popularisiert. Moses Schönfinkel oder sogar Gottlob Frege haben sie wohl bereits vor ihm in veröffentlichten Schriften angesprochen.
-[^12] (https://nixos.org/manual/nixos/stable/#sec-configuration-file){:target="_blank"}.
+[^12]: (https://nixos.org/manual/nixos/stable/#sec-configuration-file){:target="_blank"}.
 [^13]: Vgl. Dolstra 2006, 80.
