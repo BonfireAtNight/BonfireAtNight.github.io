@@ -228,8 +228,46 @@ Das Ergebnis dieser Operation ist `{ a = "hello"; b = "world" }`. Wenn ein Name 
 ```
 Dieser Ausdruck evaluiert zu `{ a = "right" }`.
 
+Im offiziellen Handbuch gibt ein schönes Beispiel dafür, wie der Operator zur Abstraktion und zur Vermeidung von unnötigen Wiederholungen genutzt werden kann.[^13] Wir wollen die folgende Server-Konfiguration vereinfachen:
+```nix
+{
+  services.httpd.virtualHosts =
+    { "blog.example.org" = {
+        documentRoot = "/webroot/blog.example.org";
+        adminAddr = "alice@example.org";
+        forceSSL = true;
+        enableACME = true;
+        enablePHP = true;
+      };
+      "wiki.example.org" = {
+        documentRoot = "/webroot/wiki.example.org";
+        adminAddr = "alice@example.org";
+        forceSSL = true;
+        enableACME = true;
+        enablePHP = true;
+      };
+    };
+}
+```
+Es werden zwei virtuelle Hosts definiert, die sich lediglich bezüglich des Wertes vom `document-Root`-Attributs unterscheiden. Es liegt also nahe, eine Attributmenge mit den anderen Werten zu definieren. Dieses kann mit einem Set vereinigt werden, das nur das `documentRoot`-Attribut mit dem jeweiligen Wert enthält. Diese Konfiguration wird dann zum Wert des virtuellen Host:
+```nix
+let
+  commonConfig =
+    { adminAddr = "alice@example.org";
+      forceSSL = true;
+      enableACME = true;
+    };
+in
+{
+  services.httpd.virtualHosts =
+    { "blog.example.org" = (commonConfig // { documentRoot = "/webroot/blog.example.org"; });
+      "wiki.example.org" = (commonConfig // { documentRoot = "/webroot/wiki.example.com"; });
+    };
+}
+```
+
 ## Primary Operations (PrimOps)
-Als *Primäroperationen* (*primary operations*) bzw. *PrimOps* bezeichnet man die Funktionen aus der `builtins`-Standardbibliothek, die als Teil der Nix-Sprache ohne Import verwendet werden können.[^13] Die dazu verwendete Operation, `import`, ist die wohl meistgenutzte Primäroperation. Ihr wird ein Pfad übergeben, entweder als "gewöhnliches" Pfad-Literal oder als Search-Path. Da Nix-Dateien (nur) einen Ausdruck enthalten, evaluieren Ausdrücke der Form `import <Pfad>` zum Wert des Ausdrucks in der importierten Datei.
+Als *Primäroperationen* (*primary operations*) bzw. *PrimOps* bezeichnet man die Funktionen aus der `builtins`-Standardbibliothek, die als Teil der Nix-Sprache ohne Import verwendet werden können.[^14] Die dazu verwendete Operation, `import`, ist die wohl meistgenutzte Primäroperation. Ihr wird ein Pfad übergeben, entweder als "gewöhnliches" Pfad-Literal oder als Search-Path. Da Nix-Dateien (nur) einen Ausdruck enthalten, evaluieren Ausdrücke der Form `import <Pfad>` zum Wert des Ausdrucks in der importierten Datei.
 
 Wichtig sind auch die sogenannten Fetchers. Mit Primäroperationen wie `fetchurl`, `fetchGit` oder `fetchTarball` können Dateien heruntergeladen werden. Die heruntergeladenen Dateien werden im Nix-Store abgelegt. Archive werden automatisch entspackt. Da sich Verfügbarkeit und Inhalt der runterzuladenen Datei im Laufe der Zeit ändern kann, werden die Funktionen als *unrein* (*impure*) betrachtet.
 
@@ -319,4 +357,5 @@ Scott, Michael Lee. 2016. Programming Language Pragmatics. 4. Aufl. Waltham, MA:
 [^10]: Die andere zentrale Umformungsoperation des Lambdakalküls, die Alpha-Conversion genannt wird und durch die gebundene Variablen umbenannt werden, spielt in Nix keine große Rolle.
 [^11]: Haskell Curry hat die Methodik popularisiert. Moses Schönfinkel oder sogar Gottlob Frege haben sie wohl bereits vor ihm in veröffentlichten Schriften angesprochen.
 [^12]: (https://nixos.org/manual/nixos/stable/#sec-configuration-file){:target="_blank"}.
-[^13]: Vgl. Dolstra 2006, 80.
+[^13]: (https://nixos.org/manual/nixos/stable/#sec-module-abstractions){:target="_blank"}.
+[^14]: Vgl. Dolstra 2006, 80.
