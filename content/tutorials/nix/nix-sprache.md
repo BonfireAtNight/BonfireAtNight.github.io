@@ -204,6 +204,8 @@ rec {
 ```
 Der Pfad in der letzten bedeutungsvollen Zeile beginnt von einem anderen Attribut und führt über verschiedene Ebenen zum gewünschten Wert.
 
+Es gibt Nix-Ausdrücke, mit denen Pakete im Nixpkgs-Repository bezeichnet werden. Sie stehen für sogenannte *Derivations*, das heißt für Build-Anleitungen für Software-Komponenten. Darunter befinden sich vertraute Anwendungen wie etwa `pkgs.emacs` oder `pkgs.firefox`.[^12] Derivations sind als Attributmengen implementiert. Ich gehe auf diesen Grundbegriff des Nix-Ökosystems in einem eigenen Artikel ein.
+
 ## Operationen
 Zur Komposition von Ausdrücken werden viele der typischen Operatoren verwendet. Für die arithmetischen Operationen gibt es `+`, `-`, `*` und `/`. Strings lassen sich mit `+` und Listen mit `++` verketten (*concatenation*). Es gibt die üblichen Vergleichsoperatoren (`=`, `<`, `>`, `<=`, `>=`) und die Booleschen Operatoren (`!`, `&&`, `||`).
 
@@ -227,7 +229,7 @@ Das Ergebnis dieser Operation ist `{ a = "hello"; b = "world" }`. Wenn ein Name 
 Dieser Ausdruck evaluiert zu `{ a = "right" }`.
 
 ## Primary Operations (PrimOps)
-Als *Primäroperationen* (*primary operations*) bzw. *PrimOps* bezeichnet man die Funktionen aus der `builtins`-Standardbibliothek, die als Teil der Nix-Sprache ohne Import verwendet werden können.[^12] Die dazu verwendete Operation, `import`, ist die wohl meistgenutzte Primäroperation. Ihr wird ein Pfad übergeben, entweder als "gewöhnliches" Pfad-Literal oder als Search-Path. Da Nix-Dateien (nur) einen Ausdruck enthalten, evaluieren Ausdrücke der Form `import <Pfad>` zum Wert des Ausdrucks in der importierten Datei.
+Als *Primäroperationen* (*primary operations*) bzw. *PrimOps* bezeichnet man die Funktionen aus der `builtins`-Standardbibliothek, die als Teil der Nix-Sprache ohne Import verwendet werden können.[^13] Die dazu verwendete Operation, `import`, ist die wohl meistgenutzte Primäroperation. Ihr wird ein Pfad übergeben, entweder als "gewöhnliches" Pfad-Literal oder als Search-Path. Da Nix-Dateien (nur) einen Ausdruck enthalten, evaluieren Ausdrücke der Form `import <Pfad>` zum Wert des Ausdrucks in der importierten Datei.
 
 Wichtig sind auch die sogenannten Fetchers. Mit Primäroperationen wie `fetchurl`, `fetchGit` oder `fetchTarball` können Dateien heruntergeladen werden. Die heruntergeladenen Dateien werden im Nix-Store abgelegt. Archive werden automatisch entspackt. Da sich Verfügbarkeit und Inhalt der runterzuladenen Datei im Laufe der Zeit ändern kann, werden die Funktionen als *unrein* (*impure*) betrachtet.
 
@@ -316,4 +318,5 @@ Scott, Michael Lee. 2016. Programming Language Pragmatics. 4. Aufl. Waltham, MA:
 [^9]: Es gibt einige wenige Funktionen, die ohne Argument aufgerufen werden können (*nullary functions*). `true`, `false` und `null` wurden bereits angeführt.
 [^10]: Die andere zentrale Umformungsoperation des Lambdakalküls, die Alpha-Conversion genannt wird und durch die gebundene Variablen umbenannt werden, spielt in Nix keine große Rolle.
 [^11]: Haskell Curry hat die Methodik popularisiert. Moses Schönfinkel oder sogar Gottlob Frege haben sie wohl bereits vor ihm in veröffentlichten Schriften angesprochen.
-[^12]: Vgl. Dolstra 2006, 80.
+[^12] (https://nixos.org/manual/nixos/stable/#sec-configuration-file){:target="_blank"}.
+[^13]: Vgl. Dolstra 2006, 80.
