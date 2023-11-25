@@ -267,7 +267,21 @@ in
 ```
 
 ## Primary Operations (PrimOps)
-Als *Primäroperationen* (*primary operations*) bzw. *PrimOps* bezeichnet man die Funktionen aus der `builtins`-Standardbibliothek, die als Teil der Nix-Sprache ohne Import verwendet werden können.[^14] Die dazu verwendete Operation, `import`, ist die wohl meistgenutzte Primäroperation. Ihr wird ein Pfad übergeben, entweder als "gewöhnliches" Pfad-Literal oder als Search-Path. Da Nix-Dateien (nur) einen Ausdruck enthalten, evaluieren Ausdrücke der Form `import <Pfad>` zum Wert des Ausdrucks in der importierten Datei.
+Als *Primäroperationen* (*primary operations*) bzw. *PrimOps* bezeichnet man die eingebauten Funktionen.[^14] Für gewöhnlich wird über einen eingebauten Wert, `builtins`, auf sie zugegriffen (beispielsweise `builtins.derivation`).[^builtins] Einige wenige sind im Default-Namensraum verfügbar:
+```
+abort
+baseNameOf
+dirOf
+fetchTarball
+import
+isNull
+map
+removeAttrs
+throw
+toString
+```
+
+Die wohl meistgenutzte Primäroperation ist `import`. Ihr wird ein Pfad übergeben, entweder als "gewöhnliches" Pfad-Literal oder als Search-Path. Da Nix-Dateien (nur) einen Ausdruck enthalten, evaluieren Ausdrücke der Form `import <Pfad>` zum Wert des Ausdrucks in der importierten Datei.
 
 Wichtig sind auch die sogenannten Fetchers. Mit Primäroperationen wie `fetchurl`, `fetchGit` oder `fetchTarball` können Dateien heruntergeladen werden. Die heruntergeladenen Dateien werden im Nix-Store abgelegt. Archive werden automatisch entspackt. Da sich Verfügbarkeit und Inhalt der runterzuladenen Datei im Laufe der Zeit ändern kann, werden die Funktionen als *unrein* (*impure*) betrachtet.
 
@@ -359,3 +373,4 @@ Scott, Michael Lee. 2016. Programming Language Pragmatics. 4. Aufl. Waltham, MA:
 [^12]: <a href="https://nixos.org/manual/nixos/stable/#sec-configuration-file" target="_blank">https://nixos.org/manual/nixos/stable/#sec-configuration-file</a>.
 [^13]: <a href="https://nixos.org/manual/nixos/stable/#sec-module-abstractions" target="_blank">https://nixos.org/manual/nixos/stable/#sec-module-abstractions</a>. Für den gleichen Zweck hätte auch eine Funktion definiert werden können, die den `documentRoot`-Wert als Argument nimmt.
 [^14]: Vgl. Dolstra 2006, 80.
+[^builtins]: <a href="https://ianthehenry.com/posts/how-to-learn-nix/built-in-functions/" target="_blank">https://ianthehenry.com/posts/how-to-learn-nix/built-in-functions/</a>.
