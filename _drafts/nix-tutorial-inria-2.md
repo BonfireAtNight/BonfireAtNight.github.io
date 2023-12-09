@@ -60,7 +60,7 @@ pkgs.stdenv.mkDerivation rec {
 }
 ```
 
-## Inputs
+## Der Input: pkgs
 Derivations wurden als Funktionen charakterisiert und Funktionsausdrücke (Lambdas) haben die Form `<Parameter>: <Rückgabewert>`. Weniger abstrakt betrachtet haben sie die Form `<Attributmenge>: pkgs.stdenv.mkDerivation rec {...}`.
 
 Um zu gewährleisten, dass `pkgs` zur Verfügung steht, wird es als Funktionsinput vorausgesetzt. `pkgs` scheint das Nixpkgs-Repository zu repräsentieren. Wir lernen: "Nixpkgs (...) contains functions to help in building packages and a (big) set of packages." `pkgs.stdenv.mkDerivation` dürfte eine solcher Helper-Funktion sein? Wahrscheinlich enthält das Repository genau genommen keine Pakete, sondern *Definitionen* von Paketen (oder Derivations). Also Ausdrücke, die strukturell dem obigen Beispiel ähneln.
@@ -92,10 +92,20 @@ Vielleicht das wichtigste nochmal zusammengefasst:
 - "[`pkgs`] is an alternative of using a channel, and is much more reproducible as the tarball can be fixed to a specific version as it is done here."
 - "The `pkgs` imported here is a snapshot of the *unstable* nixpkgs channel (branch?) on the `4fe8d07066f6ea82cda2b0c9ae7aee59b2d241b3` commit."
 
+## Der Output: eine Paketbeschreibung
+Der Funktionskörper enthält nur einen Ausdruck, und zwar einen Funktionsauf von `mkDerivation`. Der Rückgabewert der Funktion ist demnach zugleich der Rückgabewert der Derivation. Oder nicht? Leider lernen wir zu dieser zentralen Funktion nur sehr wenig: "`mkDerivation` takes a *set* as input and expects many *attributes* within it." Der Beitrag geht daraufhin nur auf die vielen Attribute ein. Über den Rückgabewert der Funktion erfahren wir nichts. Einleitend wurde zitiert, dass Derivations Pakete repräsentieren und *Build-Vorgänge* beschreiben. Vor diesem Hintergrund sind die vorgestellten Attribute zumindest im Allgemeinen nachvollziehbar.
+
+Das sind die erläuterten Attribute:
+- `pname` und `version`: Wie die Namen nahelegen handelt es sich um Name und Version des Pakets. Scheinbar wird auf ihrer Grundlage automatisch ein anderes Attribut definiert. Der Wert von `name` sind die miteinander verketteten Werte von `pname` und `version` (und einem Bindestrich dazwischen). Das heißt: `chord` + `0.1.0` = `chord-0.1.0`.
+- `src` erwartet als Wert ein Verzeichnis, das den zu bauenden Quellcode enthält. Wahrscheinlich könnte man mit einem Pfad auf der Verzeichnis hinweisen, etwa wenn man etwas lokal entwickelt hat? Es wird gesagt, dass im Beispiel `fetchurl` verwendet würde; tatsächlich wird `pkgs.fetchgit` verwendet. Es ist deshalb wenig überraschend, dass die URL auf ein Git-Repo verlinkt. Scheinbar kann man einen Commit-Hash als Wert für `rev` setzen, um den entsprechenden Repo-Snapshot herunterzuladen. Wie bereits bei der anderen Fetcher-Funktion oben gesehen, kann mit `sha256` die Integrität des heruntergeladenen Inhalts überprüft werden. In jedem Fall ist klar: Der Ordner mit den Quellcode-Dateien kann über Fetcher bereitgestellt werden. Mutmaßlich werden die dabei heruntergeladenen Dateien im Nix-Store abgelegt.
+- Beim `buildInputs` Attribut wird eine Liste mit Build-Dependencies angegeben (über ihren `pname`). Zum Bauen des Pakets notwendig sind die bereits oben genannten SimGrid und Boost, aber auch CMake. Sie sind verfügbar im Nixpkgs-Repo.
+- Nix unterscheideet beim Build-Vorgang verschiedene Phasen (*phases*). Für weitere Informationen dazu wird wieder auf das [Bedienungshandbuch](https://nixos.org/manual/nixpkgs/stable/#sec-stdenv-phases) verwiesen. Im Beispiel werden drei Phasen mit eigenen Anweisungen überschrieben: `configurePhase`, `buildPhase` und `installPhase`. Es wird darauf hingewiesen, dass das tatsächlich nicht notwendig gewesen wäre und nur dem pädagogischen Zweck dient, die Phasen bzw. ihren genauen Ablauf dadurch für den Leser explizit zu machen. Stattdessen führt Nix eigentlich automatisch einen sachgemäßen Build-Vorgang durch, dessen Details von den Paketen in `buildInputs` abhängt.
+
 ## Offene Fragen
 - In welchem begrifflichen Zusammenhang stehen Pakete und Derivations?
 - Welcher Zusammenhang besteht zwischen den Funktionen `derivation` und `mkDerivation`?
 - Was ist mit "path of the unpacked tree" oder dem "top-level tree of Nixpkgs" genau gemeint?
 - Was besagen die leeren geschweiften Klammern beim Aufruf von `import`?
+- Hätte `rev` auch mit `fetchurl` statt `fetchgit` funktioniert?
 
 ## Fußnoten
