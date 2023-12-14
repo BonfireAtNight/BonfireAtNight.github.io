@@ -434,3 +434,6 @@ body {
 .markdown-body a.post-date {
     color: #abb2bf;
 }
+.excerpt-part > ul:last-child {
+    margin-bottom: 16px !important;
+}
