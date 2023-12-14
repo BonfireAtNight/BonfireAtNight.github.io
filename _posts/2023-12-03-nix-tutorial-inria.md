@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Nix Tutorium"
+title:  "Inria Tutorium (1)"
 tags: nix nixos
 ---
 

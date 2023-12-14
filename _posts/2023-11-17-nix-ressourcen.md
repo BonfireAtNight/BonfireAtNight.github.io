@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  "Nix-Ressourcen"
+tags: nix nixos
 ---
 
 # Welche Ressourcen gibt es, um sich über Nix zu informieren?
