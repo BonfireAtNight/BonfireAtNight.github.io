@@ -2,9 +2,19 @@
 layout: post
 title:  "Inria Tutorium (5)"
 tags: nix nixos
+excerpt_separator: <!--more-->
 ---
 
 # Nix-Tutorium vom Nationalen Forschungsinstitut für Informatik und Automatisierung (INRIA): Teil 5
+<div class="hide-excerpt">
+Kommentar zum fünften Beitrag in der inria-Serie über Nix, <a href="https://nix-tutorial.gitlabpages.inria.fr/nix-tutorial/experiment-packaging.html" target="_blank">Deploying and Binary Cache</a>. Darin lernen wir:
+<ul>
+<li>Wie man sich die Pakete anzeigen lassen kann, von denen ein gegebenes Paket abhängt</li>
+<li>Wie man gebaute Pakte von einem Nix-Store <i>exportieren</i> und in einem anderen <i>importieren</i> kann</li>
+<li>Wie man Pakete vom Nix-Store einer Maschine A in den Nix-Store einer Maschine B kopiert</li>
+</ul>
+</div>
+<!--more-->
 Der nächste inria-Beitrag, den ich mir näher anschauen möchte, ist [Deploying and Binary Cache](https://nix-tutorial.gitlabpages.inria.fr/nix-tutorial/experiment-packaging.html){:target="_blank"}. Ich skippe den [Beitrag über Notebooks](https://nix-tutorial.gitlabpages.inria.fr/nix-tutorial/notebook.html){:target="_blank"}. Notebooks sind cool, wenn man seine Forschung oder Lernfortschritte dokumentieren möchte. Aber nicht gerade das spannendste Thema, um darüber zu schreiben.
 
 Im Einzelnen lernen wir:

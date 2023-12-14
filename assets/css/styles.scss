@@ -437,3 +437,13 @@ body {
 .excerpt-part > ul:last-child {
     margin-bottom: 16px !important;
 }
+.hide-excerpt {
+    display: none;
+}
+.excerpt-part .hide-excerpt {
+    display: block;
+    margin-bottom: 16px !important;
+}
+.hide-excerpt > ul > li:first-child {
+    padding-top: 8px;
+}
