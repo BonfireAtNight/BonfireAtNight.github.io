@@ -424,10 +424,13 @@ body {
     list-style: disc;
 }
 .excerpt-part > h1 {
-    margin-top: 15px
+    margin-top: 15px;
 }
 .post-date-small-headline {
 	font-size: 1.0em;
 	padding-bottom: .3em;
 	border-bottom: 1px solid #3e4451;
+}
+.markdown-body a.post-date {
+    color: #abb2bf;
 }
