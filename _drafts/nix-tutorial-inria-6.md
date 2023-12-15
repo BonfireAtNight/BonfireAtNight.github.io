@@ -276,7 +276,7 @@ Dazu muss dem Flake-Verzeichnis eine `default.nix`-Datei mit dem folgenden Inhal
 
 Es wird nicht weiter auf den Inhalt der Datei oder darauf eingeangen, warum genau durch sie Abwärtskombailität hergestellt wird. Ist vielleicht auch nicht so wichtig. Allgemein frage ich mich, unter welchen Umständen wir auf den alten Befehl zurückgreifen wollen würden.
 
-Tatsächlich wird angemerkt, dass wir nun noch immer nicht völlig wie bisher mit den definierten Derivations interagieren können. Wenn wir ein Paket mit `nix-build` bauen möchten, dass in einer Flake-Datei definiert wurde, dann müssen wir den genauen Attributpfad angeben.
+Tatsächlich wird angemerkt, dass wir nun noch immer nicht völlig wie bisher mit den definierten Derivations interagieren können. Wenn wir ein Paket mit `nix-build` bauen möchten, das in einer Flake-Datei definiert wurde, dann müssen wir den genauen Attributpfad angeben.
 
 Für das `hello`-Paket im ersten Beispiel wäre das etwa:
 ```bash
@@ -284,6 +284,59 @@ nix-build -A packages.x86_64-linux.hello
 ```
 
 Bei einer "gewöhnlichen" `default.nix`, wie wir sie in den vorausgegangen Beiträgn kennengelernt haben, reichte ein weitaus kürzerer Befehl (`nix-build -A hello`).
+
+## Flake Registries
+Wir erfahren etwas über Flake Registries. Dabei handelt es sich um ein Feature, das mit Kanälen verglichen wird. 
+
+Bilden sie die Grundlage für Updates unserer Inputs? Leider erfahren wir nahezu gar nichts darüber, was sie wirklich sind oder wofür sie verwendet werden. Stattdessen werden nur die Befehle aufgeführt, um sie aufzulisten, ihren Inhalt anzuzeigen und um neue Flakes dem Register hinzuzufügen. Das sind die Unterbefehle:
+```bash
+nix registry list
+nix flake show <Flake-Name>
+nix registry add <Name> <URL>
+```
+Im Beitrag wurde das Mini-Paketrepo hinzugefügt, das in vorausgegangenen Beiträgen definiert wurde (es erhält den Namen `mypkgs`).
+
+Das sagt das [offizielle Bedienungshandbuch](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-registry.html){: target="_blakn"} dazu:
+> Flake registries are a convenience feature that allows you to refer to flakes using symbolic identifiers such as `nixpkgs`, rather than full URLs such as `git://github.com/NixOS/nixpkgs`. You can use these identifiers on the command line (e.g. when you do `nix run nixpkgs#hello`) or in flake input specifications in `flake.nix` files. The latter are automatically resolved to full URLs and recorded in the flake's `flake.lock` file.
+
+Das klingt nicht so richtig wie Kanäle, oder? Eher wie `NIX_PATH`. Im Bedienungshandbuch wird auch gesagt, dass es drei verschiedene Register gibt (global, systemweit, für einzelne Benutzer).
+
+## Entwicklungsumgebungen in Flakes
+Im letzten Abschnitt der Serie wird ein Flake definiert, das eine Entwicklungsumgebung für Experimente bereitstellt. In der Umgebung ist das `chord`-Paket verfügbar; sie erhält deshalb den Namen `chordShell`. Wie im "alten" Ansatz wird die Umgebung mit `mkShell` definiert.
+
+Das zeigt, dass Shell-Umgebungen wie Pakete im Rahmen von Flakes einen Namen erhalten. Über diesen können sie wieder auf der Kommandozeile referenziert werden. Ebenso wie bei Paketen werden sie *für eine bestimmte Ziel-Architektur* definiert. Der Output-Typ heißt `devShells`.
+
+Hier das Beispiel:
+```nix
+{
+  description = "My Experiments repo";
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/22.05";
+    mypkgs.url = "git+https://gitlab.inria.fr/qguillot/mypkgs_example";
+  };
+
+  outputs = { self, nixpkgs, mypkgs }:
+    let
+      system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
+    in {
+      devShells.${system} = {
+        chordShell = pkgs.mkShell {
+          buildInputs = [
+            mypkgs.packages.${system}.chord
+          ];
+        };
+    };
+  };
+}
+```
+
+Das Flake hat zwei Inputs, Nixpkgs (`nixpkgs`) und das selbst definierte Mini-Repo (`mypkgs`). Wie bei den anderen Beispielen scheinen die Flake-Inputs als Argumente für die `outputs`-Funktion übergeben zu werden. Über `pkgs` erhalten wir Zugriff auf die `mkShell`-Funktion und über `mypkgs` haben wir Zugriff das das `chord`-Paket. Um das Paket innerhalb des Flake zu identifizieren, muss der genaue Attributpfad angegeben werden (`packages.${system}.chord`).
+
+Einleitend heißt es: "Let us create a flake for an experiments repository that will create a shell with the `chord` package available." Ich fand es zunächst überraschend, das von einem Repository gesprochenn wird. In meinem Kopf war ein Repository im Kontext von Nix primär eine Quelle von Paketen.
+
+Aber natürlich sind Flakes (unter anderem) genau das. Tatsächlich haben wir ja sogar gesagt, dass Flake-Verzeichnisse notwendig ein Git-Repo umfassen. Ja... ich weiß nicht, warum ich diesen Hinweis zunächst überraschend fand. Jedes Flake scheint demnach potenziell wie das `nixpkgs`-Repo zu fungieren.
 
 ## Offene Fragen
 - Welche Einstellungen können in der Nix-Konfigurationsdatei vorgenommen werden?
