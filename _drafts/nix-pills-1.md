@@ -1,0 +1,142 @@
+---
+layout: post
+title:  "Inria Tutorium (6)"
+tags: nix nixos
+excerpt_separator: <!--more-->
+---
+
+# Nix Pills, Chapter 1 (Kommentar)
+<div class="hide-excerpt">
+Kommentar zum ersten Kapitel der Nix Pills, <a href="https://nixos.org/guides/nix-pills/why-you-should-give-it-a-try" target="_blank">Why You Should Give it a Try</a>. Wie der Name nahelegt, wird darin die Verwendung von Nix motiviert. Der Fokus liegt dabei darauf, dass Nix es möglich macht, verschiedene Versionen und Varianten der gleichen Software-Komponenten zugleich verfügbar zu machen.
+</div>
+<!--more-->
+
+Dieser Post beginnt eine neue Serie, in der ich einige Worte über die [Nix Pills](https://nixos.org/guides/nix-pills/){: target="_blank"} schreiben möchte. "This series aims to complement the existing explanations from the more formal documents." Ich hoffe, dass einige Grundbegriffe durch die mehr konzeptuell orientierten Erklärungen klarer werden.
+
+Das erste Kapitel heißt [Wie You Should Give it a Try](https://nixos.org/guides/nix-pills/why-you-should-give-it-a-try){: target="_blank"}. Wie der Name nahelegt, wird darin die Verwendung von Nix motiviert. Der Fokus liegt dabei darauf, dass Nix es möglich macht, verschiedene Versionen und Varianten der gleichen Software-Komponenten zugleich verfügbar zu machen.
+
+Genau genommen wird Nix *nur* bezüglich der Belange von Administratoren und Entwicklern motiviert. Das ist zweifellos die primäre Zielgruppe. Ich weiß nicht, ob die Gründe für Nix stark genug sind, dass auch anderen Personen die Verwendung von Nix nahegelegt werden könnten. Dennoch werde ich im Folgenden kurz auf weitere Erwägungen eingehen, warum Nix anderen Paket-Managern vorgezogen werden kann.
+
+## Der gewöhnliche Ansatz
+Bei den meisten Paket-Managern wird global *eine* Version eines Programms installiert. Wenn verschiedene Pakete verschiedene Versionen oder Varianten bereitstellen, dann *ersetzen* ihre Inhalte einander. Das geschiet in der Regel durch ein Update, bei dem das System "auf den neuesten Stand" gebracht wird.
+
+Dabei werden Software-Komponenten als *veränderlich* (*mutable*) konzipiert.[^veraenderlich] Ich denke dieser Ansatz bestimmt, wie die meisten Linux-Nutzer über Pakete nachdenken. Und für die meisten Anwender ist das völlig in Ordnung. Sie wollen die neuesten Versionen ihrer Lieblingsprogramme, und mehr auch nicht.
+
+Auch für diesen Durchschnittsnutzer kann diese Herangehensweise zu einem Problem werden.
+> When upgrading a library, most package managers replace it in-place. All new applications run afterwards with the new library without being recompiled.
+
+Sicherlich sind die Betreiber von Bibliotheken und anderen Dependencies darum bemüht, allzu radikale Änderungen zu vermeiden. Dennoch kann es vorkommen, dass Updates dazu führen, dass davon abhängende Anwendungen nicht mehr wie erwartet funktionieren. Wenn man besonderes Pech hat, machen Systemupdates einen Boot unmöglich.
+
+Stabilitätsüberlegungen sind deshalb wichtig bei der Entscheidung der richtigen Distribution. Debian etwa [gilt](https://linuxiac.com/debian/){: target="_blank"} als besonders robust. Nutzer von Arch-basierten Systemen sind dagegen bereit, ein gewisses Risiko einzugehen, um mit den neuesten Features versorgt zu werden.[^bleeding-edge]
+
+Die meisten Menschen wissen, dass Systemupdates niemals unterbrochen werden sollten. Das hat damit zu tun, dass Daten dabei "in-place" ersetzt werden (wie es im obigen Zitat hieß). Es gibt einen definierten Ausgangszustand und einen definierten Zielzustand und das Systemzustand ist der Vorgang, vom einen ausgehend den anderen herzustellen. In der Zeit, während dieser Vorgang ausgeführt wird, befindet sich das System in keinem definierten Zustand.
+
+Das Systemverhalten während dieser Zeit ist unvorhersehbar. Das Update vorzeitig zu beenden, würde bedeuten, dass der Schwebezustand nicht mehr verlassen wird. Falls das Update nicht mehr fortgesetzt werden kann, würde ein Rollback nötig.
+
+Nix vermeidet diese Probleme. Zumindest glaube ich, dass es das tut. Nun muss ich etwas gestehen. Beide diese Punkte - breaking Updates und undefinierte Systemzustände - werden im ersten Kapitel der Nix Pills nicht direkt angesprochen. Der Fokus liegt auf einem anderen Defizit. Also: zurück zum Artikel.
+
+## Spezifische Software-Versionen und Varianten
+Für Entwickler und Systemadministratoren kann es wichtig sein, mehrere Versionen oder Varianten eines Programms zugleich auf einer Maschine installiert zu haben. Diese Szenarien müssen auf einer Weise realisiert werden, dass Konflikte zwischen verschiedenen Software-Komponenten ausgeschlossen sind.
+
+Der Beitrag gibt dazu nur zwei sehr oberflächliche Beispiele. Dennoch vermittelt das zweite davon zumindest ein vages Verständnis davon, was mit einer Software-Variante gemeint ist.
+- "(...) (S)uppose that you want to run two different instances of mysql: 5.2 and 5.5."
+- "Let's say you need an nginx service and also an nginx-openresty service."
+
+Auch das Problem, das sich daraus für den traditionellen Ansatz ergibt, wird zunächst nur oberflächlich skizziert:
+> If a package `foo-1.0` installs a program to `/usr/bin/foo`, you cannot install `foo-1.1` as well, unless you change the installation paths or the binary name. But changing the binary names means breaking users of that binary.
+
+Das Zitat deutet an, wie es zumindest prinzipiell möglich wäre, mehrere Versionen des Programms zu installieren. Wir könnten für verschiedene Binärdateien verschiedene Verzeichnisse haben (`/usr/bin/foo-1.0` und `/usr/bin/foo-1.1`). Oder wir arbeiten mit *einem* Verzeichnis und darin haben wir Binärdateien mit verschiedenen Namen (`foo-1.0` und `foo-1.1`).
+
+Bezüglich der zweiten Variante wird gesagt, dass sie "breaking users of that binary" bedeuten würde. Ist das wirklich eine adäquate Weise, das Problem zu beschreiben? Benutzer "brechen", sagt man das? Gemeint ist wahrscheinlich, dass die Binärdatei danach nicht mehr ohne Weiteres als `foo` verfügbar ist. Sicher könnte man das Problem durch Symlinks lösen. Aber der Punkt ist: es wäre weitere Arbeit notwendig.
+
+Die wahren Probleme zeigen sich dann, wenn *andere* Software-Komponenten auf unser installiertes Paket zugreifen. Wenn sie standardmäßig auf `/usr/bin/foo` zeigen, dann wären sie nun broken, wenn wir das Verzeichnis umbenannt haben. In der Linux-Welt gibt es wohl so etwas wie Standardverzeichnisse für Programme. Wenn andere Software-Komponenten damit arbeiten wollen, dann können sie unter "normalen" Umständen erwarten, sie genau an diesemm Ort zu finden. Wir haben nun aber ein Szenarie konstruiert, in dem *mehrere* Verzeichnisse in Fragn kommen.
+
+Für das von `foo` abhängende Programm brauchen wir nun also ein Paket, das auf das Verzeichnis mit der gewünschten Version zeigt. Vielleicht brauchen wir zusätzlich noch eine Variante des Programms, die von der *anderen* Version von `foo` abhängt. Dann müssen wir auch dafür ein neues Paket zusammenstellen und bauen.
+
+Es versteht sich, dass diese Netze schnell kompliziert werden können. Es können Situationen eintreten, in der wir auf *einer* Maschine viele solche Szenarien zugleich realisieren möchten oder müssen. Ohne eine systematische Strategie finden wir uns schnell in "dependency hell".
+
+## Alternativen
+Der Beitrag spricht kurz über drei Alternativen, wie man mit den geschilderten Situationen umgehen und wie Software-Konflikte vermieden werden können:
+- "From an administrator's point of view: you can use containers. The typical solution nowadays is to create a container per service, especially when different versions are needed. That somewhat solves the problem, but at a different level and with other drawbacks. For example, needing orchestration tools, setting up a shared cache of packages, and new machines to monitor rather than simple services."
+- "From a developer's point of view: you can use virtualenv for python, or jhbuild for gnome, or whatever else. But then how do you mix the two stacks? How do you avoid recompiling the same thing when it could instead be shared? Also you need to set up your development tools to point to the different directories where libraries are installed. Not only that, there's the risk that some of the software incorrectly uses system libraries."
+- "Debian, for example, partially solves the problem with the [alternatives](https://wiki.debian.org/DebianAlternatives){: target="_blank"} system."
+
+Leider weiß ich über keine dieser Alternativen genug, um ihre Vor- und Nachteile überzeugend zu diskutieren. Dies ist wohl auch nicht der richtige Ort dafür. Uns geht es darum, welche Strategien Nix bereitstellt.
+
+## Unveränderliche Software
+Nix zeichnet sich dadurch aus, dass die Idee veränderlicher Software fallengelassen wird.
+> With Nix you switch to using other software with its own stack of dependencies, but there's no formal notion of upgrade or downgrade when doing so.
+
+Ich denke die Rede von "other software" ist in diesem Kontext irreführend. Es kann sein, dass MySQL 5.2 bereits installiert war und es kann sein, dass wir zu MySQL 5.5 switchen. Dann ist MySQL 5.5 die andere Software.
+
+An dieser Stelle wird (noch) nicht erklärt, worin dieser Switch besteht. Das hat vermutlich etwas mit Benutzerumgebungen zu tun. Hier kommt es lediglich darauf an, dass wir die "alte" Version vielleicht schon hatten und nun die "neue" Version (zusätzlich) installieren. Oder auch andersherum: Wir können die "neue" Version gehabt haben und die "alte" Version einrichten.
+
+"Installieren" ist vielleicht auch das falsche Wort. Vorhandene Software-Komponenten sind as Resultat von Build-Vorgängen. Das ist der erste Schritt einer Installation. In einem zweiten Schritt werden sie Nutzern zugänglich gemacht. Für einen gegebenen Zweck wollen wir einem Benutzer vermutlich *entweder* Version 5.5 *oder* 5.2 zugänglich machen. Wenn der Anwender ein anderes Projekt angeht, dann möchte er vielleicht "switchen", so dass eine andere Version zugänglich gemacht wird.[^umgebungen]
+
+## Atomare Pakete
+Andere Quellen sprechen davon, dass Pakete in Nix *atomar* und voneinader perfekt unabhängig sind. Diese Sichtweise wird von den Nix Pills (zumindest im ersten Kapitel) nicht ausdrücklich angesprochen. Doch sie hilft, die Idee unveränderlicher Software zu motivieren.
+
+Pakete können verschiedene Software-Komponenten in bestimmten Versionen umfassen und miteinander in Dependency-Relationen setzen. Pakete können völlig unabhängig voneinader eingerichtet und entfernt werden.
+
+Der Vorteil dieser Herangehensweise liegt darin, dass "Updates" eine Anwendung niemals brechen können. Wenn wir ein neuere Versionen umfassendes Paket eines Programms bauen, kann es sein, dass wir dadurch eine nicht (mehr) voll funktionsfähige Anwendung erhalten. Doch dieses Paket repräsentiert ein *anderes* Setup. Für gewöhnlich gibt es noch den nach wie vor funktionsfähigen Build-Output des Pakets, das der Nutzer ersetzen wollte. Solange dieses nicht entfernt wurde, können wir dahin zurückwechseln. Wenn es entfernt wurde, können wir es neu bauen und dahin switchen.
+
+Deshalb wird im Beitrag gesagt, dass Anwendungen bei Updates neu kompiliert werden müssen. Darin unterscheidet sich Nix von anderen Paket-Managern, die mit statischen Verzeichnissen und veränderlicher Software arbeiten.
+
+Angenommen wir haben eine Anwendung, die von der Bibliothek `glibc` abhängt. Dann enthält das Paket der Anwendung einen Verweis auf `glibc`. Da wir es nun aber immer mit *bestimmten* Versionen zu tun haben, zeigt der Pfad die bestimmte Veriante der Bibliothek an (*the glibc path (...) has been hardcodedhardcoded*).
+
+Wenn wir `glibc` updaten, dann erhalten wir als Output ein *neues* Verzeichnis. Wenn eine Anwendung diese neue Version nutzen möchte, dann muss das Paket auf das neue Verzeichnis zeigen. Um den neuen Pfad ins Programm zu inkorporieren, muss das neue Paket kompiliert werden. Und so bei allen Anwendungen, die die neue Version der Bibliothek nutzen sollen.
+
+## Der Nix-Store
+Der Beitrag betont, dass Nix keine Annahmen über den globalen Systemzustand macht (*no assumptions about the global state of the system*).[^nixos] Nix arbeitet mit dem sogenannten Nix-Store, in dem Unterverzeichnisse für alle gebauten Pakete erstellt werden. Das sind die *Build-Outputs*, von denen im Beitrag an einigen Stellen die Rede ist. Der Store wird für gewöhnlich unter `/nix/store` installiert.
+
+Die Namen der Unterverzeichnisse des Nix-Store enkodieren Informationen über die Inputs, mit denen sie gebaut wurden. Das erfolgt in Form von Hash-Werten.
+> Let's take a bash derivation as an example: `/nix/store/s4zia7hhqkin1di0f187b79sa2srhv6k-bash-4.2-p45/`. This is a directory in the Nix store which contains `bin/bash`.
+
+Wir erfahren auch, wie man sich die spezifischen Versionen anzeigen lassen kann, mit denen ein Build-Output gebaut wurde. Dazu kann `ldd` verwendet werden. Da es für gewöhnlich nicht offensichtlich ist, welche Variante des Programms wir verwenden und in welchem Unterverzeichnis des Nix-Store sie sich befindet, können wir das Verzeichnis mit `which` ermitteln und den Wert als Argument an `ldd` übergeben.
+```bash
+ldd  `which <Programm>`
+```
+
+Aus dem Hash-Wert ergibt sich, womit *diese* Variante von Bash gebaut wurde. Anders als ein (eines) globales Bash (das sich für gewöhnlich in `/bin/bash` finden würde), ist diese Anwendung völlig in sich geschlossen. Falls es andere Bash-Varianten im Store gibt, dann ist sie völlig unabhängig davon. Analoges gilt für *alle* Build-Outputs.
+
+Es wird darauf hingewiesen, dass der Hash-Wert in letzter Instanz ausschlaggebend ist:
+>  Don't be confused by the version in the derivation name: it's only a name for us humans. You may end up having two derivations with the same name but different hashes: it's the hash that really matters.
+
+Es werden auch Vorteile für Administratoren und Entwickler angeführt:
+- "From an administrator's point of view: if you want an old PHP version for one application, but want to upgrade the rest of the system, that's not painful any more."
+- "From a developer's point of view: if you want to develop webkit with llvm 3.4 and 3.3, that's not painful any more."
+
+## Weitere Schwierigkeiten
+Der Beitrag spricht drei weitere Schwierigkeiten an, die der Nix-Ansatz lösen muss. Es wird darauf hingewiesen, dass Nix keinen formalen Begriff von Upgrades hat (*no formal notion of upgrades and downgrades*). Es stellt sich deshalb die Frage, wie die Sicherheit unserer installierten Software gewährleistet werden kann.
+
+Eine Antwort auf diese Frage wird vertagt: "In Nix we have some tricks (still pure) to solve this problem, but that's another story." Können Sicherheitsausbesserungen in alte Versionen integriert werden? Ist es das, was Nix macht?
+
+Das andere Problem betrifft Software, die zur Laufzeit zusammengesetzt wird: "Another problem is that unless software has in mind a pure functional model, or can be adapted to it, it can be hard to compose applications at runtime." Dieser Punkt wird in knappen Worten anhand eines Beispiels illustriert:
+>  Let's take Firefox for example. On most systems, you install flash, and it starts working in Firefox because Firefox looks in a global path for plugins.
+> 
+> In Nix, there's no such global path for plugins. Firefox therefore must know explicitly about the path to flash. The way we handle this problem is to wrap the Firefox binary so that we can setup the necessary environment to make it find flash in the nix store. That will produce a new Firefox derivation: be aware that it takes a few seconds, and it makes composition harder at runtime. 
+
+Wenn ich das richtig lese, dann unterstellt das Zitat, dass Firefox Komponenten hat. "Zur Laufzeit zusammengesetzt" heißt wahrscheinlich: Wenn ich Firefox starte, dann wird mir eine Firefox-Variante mit den Features und Komponenten präsentiert, die ich haben möchte. Das Beispiel spricht von Flash. Ist das noch ein Ding? Geht es hier um Add-Ons und Erweiterungen?
+
+Das Problem scheint jedenfalls zu sein, dass es in Nix kein globales Verzeichnis für Plugins dieser Art gibt. Stattdessen finden sie sich (wenn ich das richtig verstehe) als Komponenten im Nix-Store. Firefox muss deshalb die Pfade zu den Erweiterungen kennen, die verwendet werden sollen. Laut dem Zitat wird dazu ein Wrapper um die Firefox-Binärdatei geworfen.
+
+Durch den Wrapper können wir (laut Zitat) eine Ausführumgebung festlegen, in der Firefox "weiß", über welche Store-Pfade es die Erweiterungen findet. Was passiert bei einem "Update"? Wenn neuere Versionen der Erweiterungen eingerichtet werden, wird der Wrapper dann automatisch mit den neuen Store-Verzeichnissen versorgt?
+
+Der Anwender würde wahrscheinlich am liebsten einfach über die "installieren Erweiterungen" nachdenken. Werden die Implementierungsdetails adäquat verborgen? 
+
+Schließlich noch eine dritte Schwierigkeit, die sich daraus ergibt, dass in Nix keine Updates im gewöhnlichen Sinne durchgeführt werden.
+>  There are no upgrade/downgrade scripts for your data. It doesn't make sense with this approach, because there's no real derivation to be upgraded. With Nix you switch to using other software with its own stack of dependencies, but there's no formal notion of upgrade or downgrade when doing so.
+> 
+> If there is a data format change, then migrating to the new data format remains your own responsibility. 
+
+Ich glaube ich bräuchte ein Beispiel, um das zu verstehen. Wie würde ein solcher Datenformat-Wechsel aussehen? Wie würde der traditionelle Ansatz damit umgehen? Ich fühle mich mit dieser Verantwortung überfordert.
+
+## Offene Fragen
+- Nix hat keinen formalen Begriff von Updates. Dennoch können wir von einer Version einer Anwendung zu einer anderen Wechsel. Worin genau besteht dieser Wechsel?
+- Was ist damit gemeint, Software zur Laufzeit zusammenzusetzen (*compose applications at runtime*)?
+
+## Fußnoten
+[^veraenderlich]: Man kann sagen, dass das System dann insgesamt als veränderlich betrachtet wird. Das System zu updaten bedeutet dann: "(to) mutate the global state of the system".
+[^bleeding-edge]: Von [offizieller Seite](https://archlinux.org/about/){: target="_blank"} heißt es dazu: " Arch strives to stay bleeding edge, and typically offers the latest stable versions of most software."
+[^umgebungen]: Aus der Post-Serie über das Tutorium des inria weiß ich bereits, dass Software im Rahmen von selbst definierten Shell-Umgebungen verfügbar gemacht werden können. Je nach Projekt können verschiedene Umgebungen betreten werden.
+[^nixos]: NixOS ist eine Distribution, die auf Nix basiert. Dabei werden Systemzustände mit Nix verwaltet. Dabei geht es aber um das System im engeren Sinne (Benutzer, Dienste etc.). Installierte Pakete sind ein Aspekt davon.
