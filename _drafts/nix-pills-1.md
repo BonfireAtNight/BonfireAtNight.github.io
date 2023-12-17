@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Inria Tutorium (6)"
+title:  "Nix Pills (1)"
 tags: nix nixos
 excerpt_separator: <!--more-->
 ---
@@ -87,40 +87,45 @@ Angenommen wir haben eine Anwendung, die von der Bibliothek `glibc` abhängt. Da
 Wenn wir `glibc` updaten, dann erhalten wir als Output ein *neues* Verzeichnis. Wenn eine Anwendung diese neue Version nutzen möchte, dann muss das Paket auf das neue Verzeichnis zeigen. Um den neuen Pfad ins Programm zu inkorporieren, muss das neue Paket kompiliert werden. Und so bei allen Anwendungen, die die neue Version der Bibliothek nutzen sollen.
 
 ## Der Nix-Store
-Der Beitrag betont, dass Nix keine Annahmen über den globalen Systemzustand macht (*no assumptions about the global state of the system*).[^nixos] Nix arbeitet mit dem sogenannten Nix-Store, in dem Unterverzeichnisse für alle gebauten Pakete erstellt werden. Das sind die *Build-Outputs*, von denen im Beitrag an einigen Stellen die Rede ist. Der Store wird für gewöhnlich unter `/nix/store` installiert.
+Der Beitrag betont, dass Nix keine Annahmen über den globalen Systemzustand macht (*no assumptions about the global state of the system*).[^nixos] Nix arbeitet mit dem sogenannten Nix-Store, einem speziellen Verzeichnis, in dem Unterverzeichnisse für alle gebauten Pakete erstellt werden. Das sind die *Build-Outputs*, von denen im Beitrag an einigen Stellen die Rede ist. Der Store wird für gewöhnlich unter `/nix/store` installiert.
 
-Die Namen der Unterverzeichnisse des Nix-Store enkodieren Informationen über die Inputs, mit denen sie gebaut wurden. Das erfolgt in Form von Hash-Werten.
+Die Namen der Unterverzeichnisse enkodieren Informationen über die Inputs, mit denen sie gebaut wurden. Das erfolgt in Form von Hash-Werten.
 > Let's take a bash derivation as an example: `/nix/store/s4zia7hhqkin1di0f187b79sa2srhv6k-bash-4.2-p45/`. This is a directory in the Nix store which contains `bin/bash`.
+
+So lässt sich über den Hash-Wert entscheiden, ob gegebene Outputs die exakt richtige Variante eines Programms repräsentieren. Das ist wichtig bei der Frage, ob ein Paket gebaut werden muss oder ob der Output bereits im Store vorhanden ist. Darüber kann auch bestimmt werden, ob vom Nix Binary Cache Store ein gebautes Paket heruntergeladen werden kann statt es selbst bauen zu müssen.
+
+Es wird darauf hingewiesen, dass der Hash-Wert in letzter Instanz ausschlaggebend ist:
+>  Don't be confused by the version in the derivation name: it's only a name for us humans. You may end up having two derivations with the same name but different hashes: it's the hash that really matters.
 
 Wir erfahren auch, wie man sich die spezifischen Versionen anzeigen lassen kann, mit denen ein Build-Output gebaut wurde. Dazu kann `ldd` verwendet werden. Da es für gewöhnlich nicht offensichtlich ist, welche Variante des Programms wir verwenden und in welchem Unterverzeichnis des Nix-Store sie sich befindet, können wir das Verzeichnis mit `which` ermitteln und den Wert als Argument an `ldd` übergeben.
 ```bash
 ldd  `which <Programm>`
 ```
 
-Aus dem Hash-Wert ergibt sich, womit *diese* Variante von Bash gebaut wurde. Anders als ein (eines) globales Bash (das sich für gewöhnlich in `/bin/bash` finden würde), ist diese Anwendung völlig in sich geschlossen. Falls es andere Bash-Varianten im Store gibt, dann ist sie völlig unabhängig davon. Analoges gilt für *alle* Build-Outputs.
-
-Es wird darauf hingewiesen, dass der Hash-Wert in letzter Instanz ausschlaggebend ist:
->  Don't be confused by the version in the derivation name: it's only a name for us humans. You may end up having two derivations with the same name but different hashes: it's the hash that really matters.
-
-Es werden auch Vorteile für Administratoren und Entwickler angeführt:
+Die Outputs sind völlig in sich geschlossen. Wenn es andere Varianten der gleichen Programms im Store gibt, dann sind sie voneinander perfekt unabhängig. Daraus ergeben sich Vorteile für Administratoren und Entwickler angeführt:
 - "From an administrator's point of view: if you want an old PHP version for one application, but want to upgrade the rest of the system, that's not painful any more."
 - "From a developer's point of view: if you want to develop webkit with llvm 3.4 and 3.3, that's not painful any more."
 
 ## Weitere Schwierigkeiten
-Der Beitrag spricht drei weitere Schwierigkeiten an, die der Nix-Ansatz lösen muss. Es wird darauf hingewiesen, dass Nix keinen formalen Begriff von Upgrades hat (*no formal notion of upgrades and downgrades*). Es stellt sich deshalb die Frage, wie die Sicherheit unserer installierten Software gewährleistet werden kann.
+Der Beitrag spricht drei Schwierigkeiten an, für die im Rahmen des Nix-Store eine Lösung gefunden werden muss:
+- Wie mit Sicherheitsupdates umgehen?
+- Wie mit kompositionaler Software umgehen?
+- Wie mit Datenformat-Änderungen umgehen?
+
+Es wird darauf hingewiesen, dass Nix keinen formalen Begriff von Upgrades hat (*no formal notion of upgrades and downgrades*). Es stellt sich deshalb die Frage, wie die Sicherheit unserer installierten Software gewährleistet werden kann.
 
 Eine Antwort auf diese Frage wird vertagt: "In Nix we have some tricks (still pure) to solve this problem, but that's another story." Können Sicherheitsausbesserungen in alte Versionen integriert werden? Ist es das, was Nix macht?
 
-Das andere Problem betrifft Software, die zur Laufzeit zusammengesetzt wird: "Another problem is that unless software has in mind a pure functional model, or can be adapted to it, it can be hard to compose applications at runtime." Dieser Punkt wird in knappen Worten anhand eines Beispiels illustriert:
+Eine zweite Schwierigkeit betrifft Software, die zur Laufzeit zusammengesetzt wird: "(...) (U)nless software has in mind a pure functional model, or can be adapted to it, it can be hard to compose applications at runtime." Dieser Punkt wird in knappen Worten anhand eines Beispiels illustriert:
 >  Let's take Firefox for example. On most systems, you install flash, and it starts working in Firefox because Firefox looks in a global path for plugins.
 > 
 > In Nix, there's no such global path for plugins. Firefox therefore must know explicitly about the path to flash. The way we handle this problem is to wrap the Firefox binary so that we can setup the necessary environment to make it find flash in the nix store. That will produce a new Firefox derivation: be aware that it takes a few seconds, and it makes composition harder at runtime. 
 
-Wenn ich das richtig lese, dann unterstellt das Zitat, dass Firefox Komponenten hat. "Zur Laufzeit zusammengesetzt" heißt wahrscheinlich: Wenn ich Firefox starte, dann wird mir eine Firefox-Variante mit den Features und Komponenten präsentiert, die ich haben möchte. Das Beispiel spricht von Flash. Ist das noch ein Ding? Geht es hier um Add-Ons und Erweiterungen?
+Firefox wird als Beispiel für kompositionale Software angeführt. "Zur Laufzeit zusammengesetzt" heißt wahrscheinlich: Wenn ich Firefox starte, dann wird mir eine Firefox-Variante mit den Features und Komponenten präsentiert, die ich haben möchte. Das Beispiel spricht von Flash. Ist das noch ein Ding? Geht es hier um Add-Ons und Erweiterungen?
 
-Das Problem scheint jedenfalls zu sein, dass es in Nix kein globales Verzeichnis für Plugins dieser Art gibt. Stattdessen finden sie sich (wenn ich das richtig verstehe) als Komponenten im Nix-Store. Firefox muss deshalb die Pfade zu den Erweiterungen kennen, die verwendet werden sollen. Laut dem Zitat wird dazu ein Wrapper um die Firefox-Binärdatei geworfen.
+Das Problem scheint jedenfalls zu sein, dass es in Nix kein globales Verzeichnis für Plugins dieser Art gibt. Stattdessen finden sie sich als Komponenten im Nix-Store. Firefox muss deshalb die Pfade zu den Erweiterungen kennen, die verwendet werden sollen. Laut dem Zitat wird dazu ein Wrapper um die Firefox-Binärdatei geworfen.
 
-Durch den Wrapper können wir (laut Zitat) eine Ausführumgebung festlegen, in der Firefox "weiß", über welche Store-Pfade es die Erweiterungen findet. Was passiert bei einem "Update"? Wenn neuere Versionen der Erweiterungen eingerichtet werden, wird der Wrapper dann automatisch mit den neuen Store-Verzeichnissen versorgt?
+Durch den Wrapper können wir eine Ausführumgebung bestimmen, in der Firefox "weiß", über welche Store-Pfade es die Erweiterungen findet. Klingt einleuchtend soweit. Für mich stellt sich aber die Frage, was bei einem "Update" passiert? Wenn neuere Versionen der Erweiterungen eingerichtet werden, wird der Wrapper dann automatisch mit den neuen Store-Verzeichnissen versorgt?
 
 Der Anwender würde wahrscheinlich am liebsten einfach über die "installieren Erweiterungen" nachdenken. Werden die Implementierungsdetails adäquat verborgen? 
 
@@ -133,7 +138,8 @@ Ich glaube ich bräuchte ein Beispiel, um das zu verstehen. Wie würde ein solch
 
 ## Offene Fragen
 - Nix hat keinen formalen Begriff von Updates. Dennoch können wir von einer Version einer Anwendung zu einer anderen Wechsel. Worin genau besteht dieser Wechsel?
-- Was ist damit gemeint, Software zur Laufzeit zusammenzusetzen (*compose applications at runtime*)?
+- Was genau ist damit gemeint, Software zur Laufzeit zusammenzusetzen (*compose applications at runtime*)?
+- Was muss im Rahmen von Nix getan werden, um Datenformat-Wechseln beim Update von Software Rechnung zu tragen?
 
 ## Fußnoten
 [^veraenderlich]: Man kann sagen, dass das System dann insgesamt als veränderlich betrachtet wird. Das System zu updaten bedeutet dann: "(to) mutate the global state of the system".
