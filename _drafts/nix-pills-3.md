@@ -80,7 +80,21 @@ Wenn ich ihren Zweck richtig verstehe, dann dienen Nutzerumgebungen dazu, versch
 
 Das bedeutet nicht, dass Store-Inhalte *nur* über Nix-Umgebungen erreichbar sind. Wenn der aktive Benutzer über die notwendigen Rechte verfügt, dann kann er *direkt* mit dem Nix-Store interagieren. Im Beitrag werden zwei Aspekte angesprochen: Es wird gezeigt, wie Informationen über im Store installierte Pakete *abgefragt* werden können; und es werden Programme unabhängig von Benutzerumgebungen ausgeführt.
 
-Für Store-Abfragen (*queries*) dient das Tool `nix-store`. Wir erfahren, wie man sich Abhängigkeitsbeziehungen zwischen den Paketen im Store anzeigen lassen kann.
+Für den zweiten Fall wird ein Szenario angesprochen, bei dem der Benutzer Nix selbst deinstalliert hat. Man könnte denken, dass Nix dadurch in einem grundlegenden Sinne entfernt wurde. Ohne Nix kann man auch nichts mit Nix installieren, richtig? Und wenn man nichts installieren kann, dann kann man auch Nix nicht installieren.
+
+Der Abschnitt *Recovering the hard way* dient wohl primär dem Ziel, das darin ausgedrückte Missverständnis auszuräumen. Programme werden *für Benutzer* installiert und deinstalliert. Wenn ein Benutzer etwas deinstalliert, bedeutet das *nicht*, dass sie dadurch vom Computer entfernt werden.
+
+So auch bei Nix selbst. Wenn ein Benutzer Nix deinstalliert hat, dann sind `nix-env` und ähnliche Anwendungen nicht mehr ohne Weiteres verfügbar. Doch wenn sie nicht radikal aus dem Store gelöscht wurden, dann finden sie sich noch immer an den im vorausgegangenen Abschnitt angesprochenen Orten.
+
+Wir könnten also `nix-env` verwenden, um Nix erneut für den Benutzer zu installieren:
+```bash
+/nix/store/ig31y9gfpp8pf3szdd7d4sf29zr7igbr-nix-2.1.3/bin/nix-env -i /nix/store/ig31y9gfpp8pf3szdd7d4sf29zr7igbr-nix-2.1.3/bin/nix-env 
+```
+
+Das Beispiel demonstriert damit auch den praktischen Nutzen von Benutzerumgebungen.
+
+## Abhängigkeiten zwischen Paketen
+Für Store-Abfragen (*queries*) dient ein Unterbefehl des `nix-store`-Tools: `nix-store --query`. Wir erfahren, wie man sich damit Dependencies von Paketen im Store anzeigen lassen kann.
 
 Im gewöhnlichen Fall möchte man sich vielleicht die Dependencies eines gegebenen Pakets anzeigen lassen. Hier ist zwischen zwei Fällen zu unterscheiden: Im ersten Fall interessieren uns die *direkten* Abhängigkeiten. Sie lassen sich abfragen mit:
 ```bash
@@ -112,13 +126,36 @@ Mit einem anderen Befehl können die *Abhängigkeitsbeziehugen* (in übersichtli
 nix-store -q --tree <Derivation>
 ```
 
+## Kanäle
+Bei vielen Paketmanagern können Anwender die Frage ausblenden, von welchen Quellen Paketen installiert werden. Nix expliziert diesen Aspekt über das Konzept der *Kanäle* (*channels*).[^flakes] Kanäle zeigen auf Branches von Paket-Repositories. Sie enthalten Paket-*Definitionen*, *Derivations* im Nix-Jargon. Wir haben an anderer Stelle bereits gelernt, dass Derivations in Nix immer auch Build-Anweisungen enthalten.  
+
+Kanäle werden mit dem `nix-channel`-Tool verwaltet. Im Beitrag wird auf zwei Unterbefehle eingegangen.
+
+Mit `nix-channel --list` können wir uns alle Kanäle auflisten lassen, über die wir gegenwärtig Pakete installieren können. Es wird gesagt, dass in vielen Szenarien nur *ein* Kanal eingerichtet wird. Wir erfahren auch, dass der Unterbefehl im Wesentlichen den Inhalt von `~/.nix-channels` ausgibt.
+
+Wir wird darauf hingewiesen, dass die Kanalnamen der aufgelisteten Kanäle abweichen können, wenn Nix als Teil von NixOS installiert ist. Es wird nicht erläutert, ob sich nur die *Namen* unterscheiden oder ob es sich um vergleichbare aber *verschiedene* Kanäle handelt.
+
+In gewöhnlichen Paketmanagern können alle installierten Pakete mit einem allgemeinen *Update* auf den neuesten Stand gebracht werden. In Nix lassen sich Kanäle *updaten*. Es wird gesagt, dass diese Nix-Operation vergleichbar ist (*quite similar*) mit dem, was bei anderen Paketmanagern bei einem Update passiert. Das heißt vermutlich, dass installierte Anwendungen auf den neuesten Stand gebracht werden.
+
+Im ersten Kapitel wurde betont, dass Nix im Grunde kein Konzept von einem aktuellen Systemstand hat. Es stellt sich deshalb die Frage, was beim Update genau passiert. Hier die Erklärung, die von den Nix Pills gegeben wird:
+> (...) `nix-channel --update` (...) will download the new Nix expressions (descriptions of the packages), create a new generation of the channels profile and unpack it under `~/.nix-defexpr/channels`.
+
+Wenn unsere Annahme richtig ist, dann werden die dort abgelegten Definitionen genutzt, um aktuellere Versionen der installierten Programme einzurichten. Durch Kanal-Updates wird lokal der späteste Stand (Commit) eines Branches abgebildet. Und da den Kanälen entsprechende Branches die Idee früherer und späterer Versionen inkorporieren, kann Nix darüber die *aktuellen* Versionen von Paketen identifizieren.
+
+Das klingt alles sehr ähnlich wie das, was beim traditionellen Ansatz passiert. Tatsächlich gilt diese Herangehensweise mittlerweile als überholt. Vor allem wird sie nicht dem Anspruch an perfekte *Reproduzierbarkeit* gerecht, den Nix stellt. In einem späteren Beitrag wird gezeigt, wie *Flakes* und ihre Inputs die Idee von Kanälen ersetzen können.
+
+## Generationen
+Mit jeder Änderungen der Umgebung eines Benutzers wird eine neue *Generation* erstellt. Dadurch wird es möglich, zu einem *früheren* Stand zurückzukehren. Falls gewünscht kann danach zu einem *späteren* Stand zurückgekehrt werden. Der Einfachheit halber, werden Generationen Zahlen durchnummeriert.
+
 ## Offene Fragen
 - Welcher Mechanismus entscheidet darüber, welche Version eines Programms installiert wird, wenn nur der Derivationsname ohne eine Version angegeben wird?
 - Was sind `drv`-Dateien und welchem Zweck dienen sie?
 - Warum werden für ein so einfaches Programm wie `Hello` 36 Symlinks erstellt?
 - Dient `nix-store` nur für Abfragen oder können dadurch auch Änderungen am Store vorgenommen werden?
+- Verwendet NixOS lediglich verschiedene Namen für dieselben Kanäle oder handelt es sich um andere aber vergleichbare Kanäle?
 
 ## Fußnoten
 [^version]: Genauer müsste man vielleicht sagen: `bin` zeigte auf ein Unterverzeichnis einer *bestimmten Version* von `nix`.
 [^kein-link]: Dies erkennen wir daran, wenn wir uns den Inhalt des Profil-Verzeichnisses mit `ls` auflisten lassen (`ls -l ~/.nix-profile/`). Anders als beispielsweise `etc` zeigt `bin` auf kein anderes Verzeichnis (kein `->` hinter dem Namen).
 [^man]: Im Beitrag wird auf die Installation von `man` eingegangen. Sie ist für die Thematik des Abschnitts nicht wesentlich. Es ist aber vielleicht interessant anzumerken, dass die üblichen Manuals für Nix über den Derivationsnamen `man-db` installiert werden können.
+[^flakes]: In neueren Versionen von Nix gibt es ein Feature, das die Paketquellenverwaltung über Kanäle ersetzt. In sogenannten *Flakes* werden die Inputs direkt angegeben.
