@@ -1,0 +1,166 @@
+---
+layout: post
+title:  "Nix Pills (5)"
+tags: nix nixos
+excerpt_separator: <!--more-->
+---
+
+# Nix Pills, Chapter 5 (Kommentar)
+<div class="hide-excerpt">
+Das fünfte Kapitel der Nix Pills, <a href="https://nixos.org/guides/nix-pills/functions-and-imports" target="_blank">Functions and Imports</a>, deckt zwei wichtige Themen ab. Der Hauptteil erklärt, wie Funktionen definiert und aufgerufen werden. Im Anschluss daran wird auf die eingebaute `import`-Funktion eingegangen.
+</div>
+<!--more-->
+
+Das fünfte Kapitel der Nix Pills, [Functions and Imports](https://nixos.org/guides/nix-pills/functions-and-imports){: target="_blank"}, deckt zwei wichtige Themen ab. Der Hauptteil erklärt, wie Funktionen definiert und aufgerufen werden. Dabei wird in knappen Worten auf Besonderheiten von Funktionen im Rahmen funktionaler Sprachen eingegangen. Im Anschluss daran geht es um die eingebaute `import`-Funktion.
+
+## Funktionen beschreiben und aufrufen
+In Nix werden Funktionen durch Lambdaausdrücke beschrieben. In dieser Form der Denotation werden sie als *anonym* betrachtet, da ihnen kein Name gegeben wurde, über den sie aufgerufen werden können.
+
+> The syntax (of a lambda expression) is extremely simple. Type the parameter name, then ":", then the body of the function. 
+
+Wir merken uns: Wenn wir einen Doppelpunkt sehen, dann haben wir es mit einem Funktionsliteral zu tun.
+
+Die durch einen Lambdaausdruck beschriebenen Funktionen lassen sich (wie alle anderen Werte) in Variablen speichern. Damit lassen sie sich über den Variablennamen aufrufen. Anders als bei vielen anderen Sprachen werden Argumente *nicht* (notwendig) in runde Klammern hinter den Funktionsausdruck geschrieben. Stattdessen ist die Syntax einfach: `<Funktionsausdruck> <Argument>`.
+```
+nix-repl> double = x: x*2
+nix-repl> double 3
+6
+```
+
+In Fällen, in denen man einen Lambdaausdruck und ein komplexes Argument nutzt, kann die Klammer um das Argument notwendig werden.
+
+## Argumentstruktur
+Wie bei vielen funktionalen Programmiersprachen, erwarten die allermeisten Nix-Funktionen genau ein Argument. Auf die Motivation für dieses Design wird an dieser Stelle nicht weiter eingegangen. Die Grundidee ist sicher, eine eindeutige Schnittstelle zu schaffen, über die Funktionen in eine Pipeline hintereinandergekettet werden können.
+
+Wenn es zunächst unkonsequent erscheinen wird, Lambdaausdrücke mit mehr als einem Parameter sind möglich. Allgemein lassen sich vier Fälle unterscheiden.
+
+- ein einfache Argument, das von *einem* Parameter aufgenommen wird
+- eine Attributmenge als Argument, die von *einem* Parameter aufgenommen wird und auf deren Attribute im Funktionskörper mit `.`-Notation zugegriffen wird
+- eine Attributmenge als Argument, die Parametern einer Parametermenge durch Pattern-Matching zugeordnet werden
+- eine Funktion als Argument, die von einem Parameter aufgenommen wird und selbst wieder einen Parameter für ein Argument hat (die Struktur lässt sich beliebig oft wiederholen)
+
+## Currying
+Zunächst zur letztgenannten Möglichkeit, wie man "eine" Funktion mit mehreren Parametern definieren kann. In Nix haben Funktionen first-class-Status. Das heißt unter anderem, dass sie Rückgabewert von Funktionen sein können. Syntaktisch haben wir dabei eine Funktion, die *ein* Argument nimmt und dafür eine lokale Variable erstellt. Wenn im Ausdruck, der ihren Funktionskörper bildet, weitere Variablen sind, dann wird darum selbst wiederum eine Funktion denotiert.
+
+Dieses Schema wird Currying genannt. Für jeden Parameter können von innen nach außen Parameter übergeben werden, bis die Funktion einen Wert zurückgibt, der nicht selbst wiederum eine Funktion ist. Was im Abstrakten kompliziert klingt, ist im Grunde ganz einfach:
+```
+nix-repl> mul = a: (b: a*b)
+nix-repl> mul
+«lambda»
+nix-repl> mul 3
+«lambda»
+nix-repl> (mul 3) 4
+12
+```
+Dieser Ausdruck ist so zu lesen, dass `3` zunächst für `a` eingesetzt wird. Der Rückgabewert der äußeren Funktion ist damit `b: 3*b`, was selbst wiederum ein Lambda ist. Dann wird `4` für `b` eingesetzt, woraus der Wert `12` resultiert.
+
+Im Beitrag wird darauf hingewiesen, dass es durch klug gesetzte Parsing-Regeln nicht notwendig ist, Argumente durch Klammersetzung ihren Lambdas zuzuordnen. So merkt man kaum noch, dass man es eigentlich jeweils mit nur einem Argument zu tun hat.
+```
+nix-repl> mul 3 4
+12
+```
+
+## Argumentmengen und Pattern-Matching
+Attributmengen können wie gewöhnliche Werte als Parameter und Argumente genutzt werden.
+```
+nix-repl> mul = s: s.a*s.b
+nix-repl> mul { a = 3; b = 4; }
+12
+```
+
+Da Attributmengen in Nix fast omnipräsent sind, gibt es eine vereinfachte Syntax, um lokale Funktionsvariablen auf Grundlage der Attribute einer übergebenen Menge zu erzeugen. Der Parameter gleicht dabei der Beschreibung einer Attributmenge, nur wird für die Attribute kein Wert gesetzt.
+```
+nix-repl> mul = { a, b }: a*b
+```
+Die Funktion muss mit einer Attributmenge als Argument aufgerufen werden, die gleichnamige Elemente enthält. 
+```
+nix-repl> mul { a = 3; b = 4; }
+12
+```
+Die Attribute der Argumentmenge werden den gleichnamigen Elementen der Parametermenge zugeordnet. Für jedes Element der Parametermenge wird eine lokale Variable erstellt, dessen Wert vom entsprechenden Attribut der Argumentmenge kommt.
+
+Es werden zwei Vorteile und ein Nachteil des Ansatzes angesprochen:
+- "Named unordered arguments: you don't have to remember the order of the arguments."
+- "You can pass sets, that adds a whole new layer of flexibility and convenience."
+- "Partial application does not work with argument sets. You have to specify the whole attribute set, not part of it."
+
+## Default-Werte und variable Attribute als Input
+Bei Lambdaausdrücken, bei denen Parameter durch Parametermengen repräsentiert werden, können Default-Werte festgelegt werden. Wenn der Funktion beim Aufruf eine Attributmenge übergeben wird, bei denen sich für einen gegebenen Parameter kein gleichnamiges Attribut findet, wird die entsprechende lokale Variable mit dem Default-Wert (statt einem übergebenen Argument) initiiert.
+
+Um einen Default-Wert zu setzen, wird dieser mit einem `?` hinter den Parameter geschrieben, für den er gesetzt werden soll.
+```
+nix-repl> mul = { a, b ? 2 }: a*b
+nix-repl> mul { a = 3; }
+6
+nix-repl> mul { a = 3; b = 4; }
+12
+```
+Im ersten Fall wurde beim Aufruf kein Wert für `b` festgelegt. Als Fallback wird deshalb `2` verwendet. Im zweiten Fall findet sich in der Menge ein Wert für `b` und dieser wird statt dem Default verwendet.
+
+Dadurch wird es möglich, Attributmengen mit weniger Elementen zu übergeben als es Parameter in der Funktionsdefinition gibt. Andersherum können Lambdas so beschrieben werden, dass sie mehr Attributmengen mit mehr als den angebenen Parametern übergeben werden können. Dazu schreibt man `, ...` hinter den letzten Parameter.
+```
+nix-repl> mul = { a, b, ... }: a*b
+nix-repl> mul { a = 3; b = 4; c = 2; }
+12
+```
+Wie man an dem Beispiel sieht, führt dieser Aufruf zu keiner Fehlermeldung. Dennoch bleibt der Nutzen weiterer Attribute unklar. Um sie im Funktionskörper verwenden zu können, müssen wir mit `.` auf sie zugreifen. Dazu wiederum ist es notwendig, der übergebenen Menge einen Namen zu geben, über den wir auf ihre Elemente zugreifen können. Das geschieht mit `<Name>@<Parametermenge>`-Notation:
+```
+nix-repl> mul = s@{ a, b, ... }: a*b*s.c
+nix-repl> mul { a = 3; b = 4; c = 2; }
+24
+```
+Wie das Beispiel zeigt, müssen der Anwenderin der Funktion Informationen über sie verfügbar sein, die über ihre Signatur hinausgehen. Im gegebenen Fall muss sie wissen, dass eine lokale Variable namens `c` im Funktionskörper verwendet wird. Um sie verwenden zu können, muss eine Attributmenge mit einem gleichnamigen Schlüssel übergeben werden.
+
+## `import`
+`.nix`-Dateien enthalten je einen Ausdruck. Mit der eingebauten `import`-Funktion kann der Wert des Ausdrucks in eine andere Datei importiert werden.
+
+Genau genommen wird zur Funktion folgendes gesagt:
+> The `import` function is built-in and provides a way to parse a `.nix` file.
+
+Was genau ist damit gemeint, dass eine `.nix`-Datei geparst wird? Kann man vereinfacht sagen, dass der Ausdruck in der Datei ausgewertet wird und das Resultat als Wert des `import`-Ausdrucks gesetzt wird?
+
+Im Beitrag wird zunächst ein sehr triviales Beispiel präsentiert. In einer Datei `a.nix` steht nur `3` und in einer Dateie `b.nix` steht nur `4`. In einer dritten Datei (`mul.nix`) wird eine Funktion definiert, in der zwei Werte miteinander multipliziert werden: `a: b: a*b`. Die drei Werte werden nun im REPL zusammengeführt:
+```
+nix-repl> a = import ./a.nix
+nix-repl> b = import ./b.nix
+nix-repl> mul = import ./mul.nix
+nix-repl> mul a b
+12
+```
+
+Für gewöhnlich wollen wir bei einem Import vermutlich verschiedene Informationen in einer Datei zusammenführen. Es überrascht deshalb, dass der Informationsfluss im Beitrag in eine andere Richtung geht: "(...) (H)ow do we pass information *to* the module?" (meine Hervorhebung)
+
+Es wird nicht auf die Motivation dieser Herangehensweise eingegangen. Unter welchen Umständen wollen wir Information in ein Modul *hineingeben*?
+
+Es wird darauf hingewiesen, dass der Gültigkeitsbereich der importierten Datei nicht den Gültigkeitsbereich der importierenden Datei erbt. Wenn in letzterer eine Variable definiert wurde, ist diese also in ersterer *nicht* ohne Weiteres verfügbar. Wenn wir eine `test.nix` mit dem Inhalt `x` haben, wird der Wert von `x` nicht aus der Umgebung übernommen:
+```
+nix-repl> let x = 5; in import ./test.nix
+error: undefined variable `x' at /home/lethal/test.nix:1:1
+```
+
+Es wird ein komplexeres Beispiel besprochen, bei dem in einer Datei eine Funktion definiert wird. Ein `import`-Ausdruck bezogen auf diese Datei fungiert demnach als Lambdaausdruck. Diesem wiederum kann das Argument übergeben werden, das somit in gewisser Weise "in die Datei" bzw. "in das Modul" hineingegeben wird.
+
+Die Modul-Datei ist `test.nix`:
+```nix
+{ a, b ? 3, trueMsg ? "yes", falseMsg ? "no" }:
+if a > b
+  then builtins.trace trueMsg true
+  else builtins.trace falseMsg false
+```
+Ziel der Funktion ist es, "yes" in dem Fall auszugeben, indem das für `a` übergebene Argument größer ist als das für `b` übergebene Argument. Es wird mit einer Argumentmenge gearbeitet und es werden Default-Werte festgelegt. Neu ist die eingebaute Funktion `trace`: "`builtins.trace` is a built-in function that takes two arguments. The first is the message to display, the second is the value to return. It's usually used for debugging purposes." Nachricht und Wert werden beide ausgegeben.
+
+So können wir auf dem REPL eine Attributmenge als Wert in die Datei hineingeben:
+```
+nix-repl> import ./test.nix { a = 5; trueMsg = "ok"; }
+trace: ok
+true
+```
+
+Die Idee scheint hier weniger zu sein, dass wir den Inhalt einer Datei in irgend einem dauerhaften Sinne in eine andere Datei einführen ("importieren" im engeren Sinne). Der Aufruf von `import` repräsentiert eher eine einmalige Verwendung.
+
+## Offene Fragen
+- Warum wurde Nix so designt, dass die allermeisten Funktionen genau ein Argument erwarten?
+- Was genau ist damit gemeint, dass Dateien bei der Verwendung von `import` geparst werden? Was ist die praktische Konsequenz daraus?
+- Unter welchen Umständen wollen wir Information in ein Modul *hineingeben*?
+
+## Fußnoten
