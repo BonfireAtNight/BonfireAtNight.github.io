@@ -11,7 +11,9 @@ Im neunten Kapitel der Nix Pills, <a href="https://nixos.org/guides/nix-pills/au
 </div>
 <!--more-->
 
-Im neunten Kapitel der Nix Pills, [Automatic Runtime Dependencies](https://nixos.org/guides/nix-pills/automatic-runtime-dependencies){: target="_blank"}, geht es um Dependencies. Wir lernen, wie wir uns Build-Dependencies und Runtime-Dependencies anzeigen lassen können. In einigen Fällen werden Dependencies falsch klassifiziert. Es wird erklärt, wie falsch zugeordnete "Runtime"-Dependencies entfernt werden können.
+Im neunten Kapitel der Nix Pills, [Automatic Runtime Dependencies](https://nixos.org/guides/nix-pills/automatic-runtime-dependencies){: target="_blank"}, geht es um Dependencies. Wir lernen, wie wir uns Build-Dependencies und Runtime-Dependencies anzeigen lassen können. In einigen Fällen werden Dependencies falsch klassifiziert. Es wird erklärt, wie falsch zugeordnete "Runtime"-Dependencies entfernt werden können. Nebenbei erfahren wir etwas über NAR-Archive und Build-Phasen.
+
+Im letzten Abschnitt heißt es, dass der vergleichweise kurze Beitrag in der in der Urlaubszeit geschrieben wurde. Um ehrlich zu, das merkt man dem Text an vielen Stellen auch an. Zusammenhänge werden nicht immer deutlich gemacht und meinem Eindruck nach bleibt das Gesamtziel des Beitrags unklar.
 
 ## Build-Dependencies
 Die Build-Dependencies eines gegebenen Pakets können seiner Store Derivation (der `.drv`-Datei) entnommen werden. Als Beispiel schauen wir uns GNU Hello näher an. Für diese Anwendung wurde im vorausgegangenen Kapitel eine Deriation geschrieben und in einer Datei (`hello.nix`) gespeichert. In einem früheren Kapitel haben wir auch gelernt, dass die Store Derivation als Nebeneffekt der Instanziierung eines Pakets erstellt wird.
@@ -115,9 +117,18 @@ Das Vorgehen wirkt ziemlich hacky und zugegebenermaßen ein wenig ad-hoc. Zwar w
 
 Es stellt sich die Frage, wie häufig Derivations fehlerhaft den Runtime-Dependencies eines Pakets hinzugefügt werden. Und sind die Bemerkungen bezüglich der Speichernutzung wirklich der Hauptgrund dafür, warum das problematisch ist?
 
-## Weitere Informationen
-Archive
-Build-Phasen
+## Nix Archive (NAR)
+Wir erfahren, dass es ein Nix-eigenes Archivformat gibt: Nix Archive, oder kurz: NAR. Man kann sich fragen, warum nicht einfach das Tar-Format genutzt wird (wie beispielsweise bei vielen Quelldateien). Dazu schreibt der Autor Folgendes:
+> (...) (C)ommonly used archivers are not deterministic. They add padding, they do not sort files, they add timestamps, etc.. Hence NAR, a very simple deterministic archive format being used by Nix for deployment. NARs are also used extensively within Nix (...).
+
+Es werden zwei Befehle angeführt, um NAR-Dateien zu erstellen und zu entpacken (extrahieren): `nix-store --dump` und `nix-store --restore`. Es wird gesagt, dass Pakete in sich geschlossen (*self-contained*) sind. Dementsprechend können so archivierte Pakete auf einer anderen Maschine entspackt und garantiert ausgeführt werden. Diese Verteilung von Software-Komponenten ist eine Form von Deployment, einem von Nix verfolgtem Hauptzweck.
+
+## Build-Phasen
+Build-Vorgänge können sehr komplex werden. Es liegt nahe, sie in einzelne Phasen einzusteilen. Dabei handelt es sich nicht nur um konzeptuelle Einteilungen. Nix definiert Phasen mit eigenen Beonderheiten. Leider erfahren wir in diesem Beitrag keine technischen Details.
+
+Der Beitrag spricht von einer Entpackphase (*unpack phase*), einer Konfigurationsphase (*configuration phase*), der eigentlichen Build-Phase (*build phase*) und einer *Installationsphase (*installation phase*). Neu hinzu kommt eine *Fixup-Phase* nach der Installation. Zu dieser Zeit werden unter anderem fälschlich hinzugefügte Runtime-Dependencies entfernt.
+
+Leider wird nicht weiter auf die Besonderheiten der Phasen eingegangen.
 
 ## Offene Fragen
 - Was genau unterscheidet Build-Dependencies und Runtime-Dependencies?
@@ -125,5 +136,7 @@ Build-Phasen
 - Warum wird `nix-store -r <Store Derivation>` ausgeführt?
 - Wie häufig werden Derivations fehlerhaft als Runtime-Dependencies hinzugefügt?
 - Warum ist es problematisch, dass sich Derivations fehlerhaft in der Liste von Runtime-Dependencies eines Pakets finden?
+- Welche Build-Phasen gibt es und was sind ihre Besonderheiten?
+- Welche anderen Dinge können während der Fixup-Phase passieren?
 
 ## Fußnoten
