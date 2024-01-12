@@ -148,6 +148,56 @@ Gut, das macht irgendwie Sinn, oder?
 
 Nur frage ich mich nun, wie wäre `<Hash-Wert>` in `/nix/store/<Hash-Wert>-foo.drv` berechnet worden, wenn wir mehr als einen Input gehabt hätten? Gibt es Typen von Store-Pfaden, über die gar nicht gesprochen wurde?
 
+## Pfade für Derivations mit fixiertem Output
+Neben Input-Pfaden (*source paths*) und Output-Pfaden (*output paths*) gibt es noch mindestens einen weiteren Typ von Store-Pfaden. Pfade für Derivations mit fixierten Outputs (*fixed-output paths*) werden vom Nixpkgs-Repository für Downloads und zur Verifikation von heruntergeladenen Quelldatei-Tarballs genutzt.
+
+In diesem Kontext werden drei spezielle Derivation-Attribute genannt: `outputHashMode`, `outputHash` and `outputHashAlgo`. Es wird nicht auf den Zweck dieser Attribute eingegangen. Stattdessen wird nur auf das [offizielle Bedienungshandbuch](https://nixos.org/manual/nix/stable/language/advanced-attributes.html){: target="_blank"} für eine Erklärung verwiesen.
+
+Dennoch erfahren wir zumindest bezüglich `outputHash`, welchen Effekt das Attribut hat:
+>  The builder must create the out path and make sure its hash is the same as the one declared with `outputHash`.
+
+Dadurch wird sichergestellt, dass "the store path only depends on the declared fixed-output hash." "It doesn't matter which input derivations are being used, the final out path must only depend on the declared hash."
+
+Im Beispiel wird der Hash einer bestimmten Datei als `outputHash`-Wert genutzt.
+```
+$ echo mycontent > myfile
+$ sha256sum myfile
+f3f3c4763037e059b4d834eaf68595bbc02ba19f6d2a500dce06d124e2cd99bb  myfile
+nix-repl> derivation { name = "bar"; system = "x86_64-linux"; builder = "none"; outputHashMode = "flat"; outputHashAlgo = "sha256"; outputHash = "f3f3c4763037e059b4d834eaf68595bbc02ba19f6d2a500dce06d124e2cd99bb"; }
+«derivation /nix/store/ymsf5zcqr9wlkkqdjwhqllgwa97rff5i-bar.drv»
+```
+Zu bemerken ist insbesondere, dass das `outputHash`-Attribut bei der Attributmenge definiert wird, die als Argument an die `derivation`-Funktion übergeben wird.
+
+In einem für mich nicht völlig offenischtlichen Sinne, werden die Informationen in die Store Derivation aufgenommen, die als Nebeneffekt des Funktionsaufrufs erzeugt wird:
+```
+$ nix derivation show /nix/store/ymsf5zcqr9wlkkqdjwhqllgwa97rff5i-bar.drv
+{
+  "/nix/store/ymsf5zcqr9wlkkqdjwhqllgwa97rff5i-bar.drv": {
+    "outputs": {
+      "out": {
+        "path": "/nix/store/a00d5f71k0vp5a6klkls0mvr1f7sx6ch-bar",
+        "hashAlgo": "sha256",
+        "hash": "f3f3c4763037e059b4d834eaf68595bbc02ba19f6d2a500dce06d124e2cd99bb"
+      }
+    },
+[...]
+}
+```
+
+Bei der Berechnung, die zu diesen Pfaden führen, finden wir zwei bekannte Schritte. Es wird wieder eine String-Beschreibung konstruiert und diese dient wieder als Grundlage, um den Hash-Wert eines Output-Pfads zu berechnen. Doch dieses Mal haben wir es mit zwei Strings zu tun und die Strings haben Komponenten, die wir bisher noch nicht kennengelernt haben (`fixed`).
+```
+$ echo -n "fixed:out:sha256:f3f3c4763037e059b4d834eaf68595bbc02ba19f6d2a500dce06d124e2cd99bb:" > mycontent.str
+$ sha256sum mycontent.str 
+423e6fdef56d53251c5939359c375bf21ea07aaa8d89ca5798fb374dbcfd7639  myfile.str
+
+$ echo -n "output:out:sha256:423e6fdef56d53251c5939359c375bf21ea07aaa8d89ca5798fb374dbcfd7639:/nix/store:bar" > myfile.str
+$ nix-hash --type sha256 --truncate --base32 --flat myfile.str
+a00d5f71k0vp5a6klkls0mvr1f7sx6ch
+```
+Der finale Hash-Wert ist ehrlich gesagt nicht, was ich erwartet hatte. Und was es mit den String-Beschreibungen hier auf sich hat wird auch in keinerlei Weise erläutert.
+
+Ziemlich hoffnungslos.
+
 ## Offene Fragen
 - Im Beispiel wird der Store-Pfad für eine Datei berechnet. Gilt völlig Analoges auch für die Berechnung von Store-Pfaden für Verzeichnisse?
 - Im Beispiel scheint der Hash-Wert vom Out-Pfad gleich dem Hash-Wert des einzigen Inputs zu sein. Liegt das daran, dass es nur *einen* Input gibt? Ist das, was damit gemeint ist, dass die Hashes (nur) auf der Basis der Inputs berechnet werden?
