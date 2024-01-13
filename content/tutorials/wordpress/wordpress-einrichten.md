@@ -129,13 +129,15 @@ Nachdem Benutzername und Passwort gewählt wurden, sind wir fertig. Wir können 
 ## Weitere Einstellungen
 
 ### Debugging
-Wenn man seine WordPress-Instanz für Entwicklungszwecke nutzt, dann sollte man den Debug-Modus aktivieren. Dadurch erhält man Einblick in die eventuell von PHP ausgegebenen Fehlermeldungen. Dazu muss die folgende Einstellung (vor `/* That's all, stop editing! Happy blogging. */`) in der `wp-config.php` hinzugefügt werden:
+Wenn man seine WordPress-Instanz für Entwicklungszwecke nutzt, dann sollte man den Debug-Modus aktivieren. Dadurch erhält man Einblick in die eventuell von PHP ausgegebenen Fehlermeldungen.
+
+Um den Modus zu aktivieren, muss eine Anpassung an der `wp-config.php` (im Wurzelverzeichnis) vorgenommen werden. Neue Einträge müssen dabei *vor* `/* That's all, stop editing! Happy blogging. */`) hinzugefügt werden:
 ```php
 // Enable WP_DEBUG mode
 define( 'WP_DEBUG', true );
 ```
 
-Dabei gibt es zwei Möglichkeiten. Durch die eben gesetzte Einstellung werden Fehlermeldungen im Adminbereich angezeigt. Zusätzlich kann eine Logdatei erstellt werden:
+Fehlermeldungen werden damit im Adminbereich angezeigt. Zusätzlich können Fehlermeldungen automatisch in einer Textdatei geloggt werden:
 ```php
 // Enable Debug logging to the /wp-content/debug.log file
 define( 'WP_DEBUG_LOG', true );
