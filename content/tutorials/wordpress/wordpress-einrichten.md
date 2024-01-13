@@ -128,6 +128,35 @@ Nachdem Benutzername und Passwort gewählt wurden, sind wir fertig. Wir können 
 
 ## Weitere Einstellungen
 
+### Debugging
+Wenn man seine WordPress-Instanz für Entwicklungszwecke nutzt, dann sollte man den Debug-Modus aktivieren. Dadurch erhält man Einblick in die eventuell von PHP ausgegebenen Fehlermeldungen. Dazu muss die folgende Einstellung (vor `/* That's all, stop editing! Happy blogging. */`) in der `wp-config.php` hinzugefügt werden:
+```php
+// Enable WP_DEBUG mode
+define( 'WP_DEBUG', true );
+```
+
+Dabei gibt es zwei Möglichkeiten. Durch die eben gesetzte Einstellung werden Fehlermeldungen im Adminbereich angezeigt. Zusätzlich kann eine Logdatei erstellt werden:
+```php
+// Enable Debug logging to the /wp-content/debug.log file
+define( 'WP_DEBUG_LOG', true );
+```
+Um die obersten Einträge einzusehen, hilft folgendes Kommando:
+```bash
+tail -f /path/to/your/wordpress/wp-content/debug.log
+```
+
+Wer die Fehlermeldungen und Warnungen im Adminbereich irritierend findet, kann sie ausschalten:
+```php
+// Disable display of errors and warnings
+define( 'WP_DEBUG_DISPLAY', false );
+@ini_set( 'display_errors', 0 );
+```
+
+In einigen Fällen kann vielliecht auch Apache nützliche Debugging-Informationen liefern. Die Logdatei kann man bequemerweise wieder mit `tail` einsehen:
+```bash
+sudo tail -f /var/log/httpd/error_log
+```
+
 ### Symlinks
 In einigen Fällen kann es hilfreich sein, in WordPress mit symbolischen Links zu arbeiten. So könnte man etwa ein Plugin oder ein Theme an einem Ort speichern, an dem ein Benutzer generell seine Projekte der Softwareentwicklung abspeichert.
 
