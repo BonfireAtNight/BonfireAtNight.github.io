@@ -126,6 +126,53 @@ Zumindest sollte es so sein. In meinem Fall bekam ich die Meldung, dass die Date
 
 Nachdem Benutzername und Passwort gewählt wurden, sind wir fertig. Wir können die Seite nun aufrufen und uns in dem Adminbereich einloggen.
 
+## Weitere Einstellungen
+
+### Symlinks
+In einigen Fällen kann es hilfreich sein, in WordPress mit symbolischen Links zu arbeiten. So könnte man etwa ein Plugin oder ein Theme an einem Ort speichern, an dem ein Benutzer generell seine Projekte der Softwareentwicklung abspeichert.
+
+So findet man seine Projekte nicht nur leichter wieder. Wenn man mit verschiedenen WordPress-Seiten arbeitet, dann weiß man ohne Weiteres, wo man die *aktuellste* Version findet. Zugleich kann man über Symlinks gewährleisten, dass alle WordPress-Instanzen diese aktuellste Version nutzen.
+
+Symlinks sind leicht erstellt:
+```bash
+ln -s ~/Repositories/my-new-plugin/ /srv/http/wordpress-development-environment/wp-content/plugins/
+```
+Leider ist dadurch noch nicht gewährleistet, dass der Link von WordPress oder dem Apache-Server wie das Zielverzeichnis behandelt wird. Wenn wir das Verzeichnis *kopiert* hätten, dann würde es zweifellos in der Liste der Plugins erscheinen. Damit auch ein verlinktes Plugin erkannt wird, müssen einige Voraussetzungen erfüllt sein.
+
+Aus Sicherheitsgründen sind sowohl WordPress als auch Apache dazu angehalten, Symlinks nicht einfach zu folgen. Damit ist der Link für sie nicht einfach das Zielverzeichnis. Für dieses Verhalten sind Einstellungen zu setzen.
+
+In WordPress muss dazu die `wp-config.php` im Wurzelverzeichnis bearbeitet werden.
+```php
+/* Add any custom values between this line and the "stop editing" line. */
+define('ALLOW_SYMLINKS', true);
+
+/* That's all, stop editing! Happy publishing. */
+```
+
+Für Apache können wir erneut die globale Konfigurationsdatei (`/etc/httpd/conf/httpd.conf`) bearbeiten.
+```
+<Directory "/srv/http/wordpress-development-environment/wp-content/plugins">
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+```
+Danach ist ein Neustart des Servers notwendig: `systemctl restart httpd.service`.
+
+Die `FollowSymLinks`-Option wird *nicht* rekursiv gesetzt. Das heißt, auch wenn man bereits eine entsprechende Einstellung für `/srv/http` hat (wie es wahrscheinlich der Fall ist), muss sie für jedes Unterverzeichnis erneut gesetzt werden.
+
+Schließlich benötigt der Server-Benutzer (in Arch-Systemen: `httpd`) Lese- und Ausführungsrechte für den Link wie auch für das Zielverzeichnis. Insbesondere werden die Rechte auch für alle Elternverzeichnisse benötigt. Ob das der Fall ist, kann der Reihe nach kontrolliert werden:
+```bash
+ls -ld /home
+ls -ld /home/kai
+ls -ld /home/kai/Repositories
+ls -ld /home/kai/Repositories/my-new-plugin
+```
+Sollte die `r-x` für Others nicht gesetzt sein, müssen die Rechte hinzugefügt oder dem Server-Benutzer auf anderem Wege Zugriff gewährt werden. Das geht beispielsweise durch das folgende Kommando:
+```bash
+chmod o+rx /home/kai
+```
+
 ## Fußnoten
 [^apache-document-root]: Falls gewünscht kann das Verzeichnis in der Apache-Konfigurationsdatei durch die Einstellung `DocumentRoot <Verzeichnis>"`geändert werden. Das Arch-Wiki warnt jedoch, dass daraufhin weitere Einstellungen notwendig werden.
 [^libphp]: Ich nutze hier der Einfachheit halber `libphp`. Falls Performance eine Rolle spielt, sollten stattdessen `apache2-mpm-worker` und `mod_fcgid` eingebunden werden. Letzteres ist im AUR verfügbar. Für weitere Erklärungen, siehe den Abschnitt im [Arch Wiki](https://wiki.archlinux.org/title/Apache_HTTP_Server#PHP){: target="_blank"}
