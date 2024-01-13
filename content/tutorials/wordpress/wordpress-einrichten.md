@@ -137,9 +137,9 @@ Symlinks sind leicht erstellt:
 ```bash
 ln -s ~/Repositories/my-new-plugin/ /srv/http/wordpress-development-environment/wp-content/plugins/
 ```
-Leider ist dadurch noch nicht gewährleistet, dass der Link von WordPress oder dem Apache-Server wie das Zielverzeichnis behandelt wird. Wenn wir das Verzeichnis *kopiert* hätten, dann würde es zweifellos in der Liste der Plugins erscheinen. Damit auch ein verlinktes Plugin erkannt wird, müssen einige Voraussetzungen erfüllt sein.
+Wenn wir das Verzeichnis *kopiert* hätten, dann würde es zweifellos in der Liste der Plugins erscheinen. Damit auch ein verlinktes Plugin erkannt wird, müssen einige Voraussetzungen erfüllt sein.
 
-Aus Sicherheitsgründen sind sowohl WordPress als auch Apache dazu angehalten, Symlinks nicht einfach zu folgen. Damit ist der Link für sie nicht einfach das Zielverzeichnis. Für dieses Verhalten sind Einstellungen zu setzen.
+Aus Sicherheitsgründen sind sowohl WordPress als auch Apache dazu angehalten, Symlinks nicht einfach zu folgen. Damit ist der Link für sie nicht einfach das Zielverzeichnis. Für dieses Verhalten sind weitere Einstellungen zu setzen.
 
 In WordPress muss dazu die `wp-config.php` im Wurzelverzeichnis bearbeitet werden.
 ```php
@@ -150,7 +150,7 @@ define('ALLOW_SYMLINKS', true);
 ```
 
 Für Apache können wir erneut die globale Konfigurationsdatei (`/etc/httpd/conf/httpd.conf`) bearbeiten.
-```
+```apache
 <Directory "/srv/http/wordpress-development-environment/wp-content/plugins">
     Options Indexes FollowSymLinks
     AllowOverride None
@@ -168,7 +168,7 @@ ls -ld /home/kai
 ls -ld /home/kai/Repositories
 ls -ld /home/kai/Repositories/my-new-plugin
 ```
-Sollte die `r-x` für Others nicht gesetzt sein, müssen die Rechte hinzugefügt oder dem Server-Benutzer auf anderem Wege Zugriff gewährt werden. Das geht beispielsweise durch das folgende Kommando:
+Sollte die `r-x` für andere Benutzer (neben dem Besitzer und der zugeordneten Gruppe) nicht gesetzt sein, müssen die Rechte hinzugefügt oder es muss dem Server-Benutzer auf anderem Wege Zugriff gewährt werden. Das geht beispielsweise durch das folgende Kommando:
 ```bash
 chmod o+rx /home/kai
 ```
