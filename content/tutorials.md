@@ -16,6 +16,8 @@ date_last_mod: 2023-09-23 10:17:00 +0200
 
 ## Vim und Neovim
 - [**Verzeichnisstruktur**]({% link content/tutorials/vim/verzeichnisstruktur.md %})
+- [**Neovim für WordPress**]({% link content/tutorials/wordpress/wordpress-in-neovim.md %})
 
 ## WordPress
 - [**WordPress einrichten (Arch Linux)**]({% link content/tutorials/wordpress/wordpress-einrichten.md %})
+- [**Neovim für WordPress**]({% link content/tutorials/wordpress/wordpress-in-neovim.md %})
