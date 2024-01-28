@@ -195,9 +195,10 @@ vim.api.nvim_set_keymap('n', '<leader>fwp', [[:!~/.config/composer/vendor/bin/ph
 ```
 Die Diagnose wird in einem neuen Split ausgegeben. Im Falle einer langen Ausgabe kann man sich darin flexibel bewegen und das Fenster im Anschluss durch `:q` schließen.
 
-Eine weitere Anpassung ist notwendig, wenn der [PSR-4-Standard](https://www.php-fig.org/psr/psr-4/){: target="_blank"} verwendet werden soll. Damit Klassen-, Interface- und Trait-Dateien automatisch mit dem konventionellen Autoloader geladen werden können, müssen sie einem vorgegebenen Namensschema folgen. Blöderweise verletzt das Schema eine Regel im WordPress-Standard: "Filenames should be all lowercase with hyphens as word separators."
+## Einige Worte über PSR-4 und Autoloading
+Eine weitere Anpassung wäre notwendig, wenn zusätzlich der [PSR-4-Standard](https://www.php-fig.org/psr/psr-4/){: target="_blank"} verwendet werden soll. Damit Klassen-, Interface- und Trait-Dateien automatisch mit dem konventionellen Autoloader geladen werden können, müssen sie einem vorgegebenen Namensschema folgen. Blöderweise verletzt das Schema eine Regel im WordPress-Standard: "Filenames should be all lowercase with hyphens as word separators."
 
-Dateinamen, die dem PSR-4-Standard folgen, werden von CodeSniffer korrekt angekreidet, wenn WordPress (wie oben) als Standard festgelegt wird. In vielen WordPress-Projekten ist die Anzahl der zu importierenden Dateien wahrscheinlich überschaubar. Wer dennoch in dieser einen Hinsicht vom WordPress-Standard abweichen möchte, kann ein eigenes CodeSniffer-Ruleset definieren, das beide Standards umfasst.
+Dateinamen, die dem PSR-4-Standard folgen, werden von CodeSniffer korrekt angekreidet, wenn WordPress (wie oben) als Standard festgelegt wird. Wer dennoch in dieser einen Hinsicht vom WordPress-Standard abweichen möchte, kann ein eigenes CodeSniffer-Ruleset definieren, das beide Standards umfasst.
 
 Die verantwortliche Regel findet sich in `$HOME/.config/composer/vendor/wp-coding-standards/wpcs/WordPress-Core/ruleset.xml`:
 ```xml
@@ -214,6 +215,10 @@ Die beiden ersten Kommentare sprechen über genau die Aspekte, die wir deaktivie
 phpcs --standard=wordpress --exclude=WordPress.Files.FileName <path>
 ```
 Wenn dieser Standard in Neovim verwendet werden soll, muss die obige Konfiguration natürlich entsprechend angepasst werden.
+
+In vielen WordPress-Projekten ist die Anzahl der zu importierenden Dateien wahrscheinlich überschaubar. Wenn die gewöhnliche WordPress-Verzeichnisstruktur genutzt werden soll, müsste das Wurzelverzeichnis als Basisverzeichnis für den Autoloader angegeben werden. Außerdem müssten für `include`, `admin` und eventuell weitere Unterverzeichnisse Subnamespaces definiert werden.
+
+Vor diesem Hintergrund bleibt man vielleicht am besten ausschließlich beim WordPress-Standard.
 
 <!-- ## Treesitter: Verbessertes Syntax-Highlighting -->
 
