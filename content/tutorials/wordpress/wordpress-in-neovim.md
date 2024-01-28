@@ -179,6 +179,8 @@ Mit den beiden anderen Zeilen wird der WordPress-Standard für CodeSniffer insta
 ```
 Es können in beiden Fällen Pfade zu einer oder mehr einzelnen Dateien oder ein Pfad zu einem Verzeichnis übergeben werden.
 
+Es sollte vielleicht ausdrücklich darauf hingewiesen werden, dass PHPCBF nicht jede Regelverletzung beheben kann. Die Anwendung ist nicht KI-gestützt, weshalb klar sein sollte, dass beispielsweise PHPDoc Comments nicht automatisch erstellt werden können. Praktischerweise zeigt PHPCS (durch ein `[X]`) an, welche Fehler automatisch behoben werden können.
+
 Als Kommandozeilenwerkzeug ist PHP_CodeSniffer damit bereits relativ hilfreich. Weitaus praktischer wird es, wenn wir es in Neovim integrieren. Dazu können wir einige Anpassungen vornehmen, die nur dann wirksam werden, wenn eine PHP-Datei geöffnet wurde. Dazu wird `~/.config/nvim/after/ftplugin/php.lua` erstellt bzw. bearbeitet.
 
 WordPress erwartet, dass echte Tabs verwendet werden. Damit ist gemeint, dass sich in unseren Quellcodedateien Tabzeichen finden. Demgegenüber bevorzugen viele Entwickler, dass durch Druck auf die `<TAB>`-Taste kein Tabzeichen, sondern eine passende Anzahl von Leerzeichen eingefügt werden. Falls `vim.opt.expandtab` global auf `true` gesetzt wurde, müssen wir die Einstellung für PHP überschreiben:
@@ -192,6 +194,26 @@ vim.api.nvim_set_keymap('n', '<leader>lwp', [[:split | :terminal ~/.config/compo
 vim.api.nvim_set_keymap('n', '<leader>fwp', [[:!~/.config/composer/vendor/bin/phpcbf --standard=wordpress --ignore=*/vendor/* --ignore=*/tests % <CR>]], { noremap = true, silent = true })
 ```
 Die Diagnose wird in einem neuen Split ausgegeben. Im Falle einer langen Ausgabe kann man sich darin flexibel bewegen und das Fenster im Anschluss durch `:q` schließen.
+
+Eine weitere Anpassung ist notwendig, wenn der [PSR-4-Standard](https://www.php-fig.org/psr/psr-4/){: target="_blank"} verwendet werden soll. Damit Klassen-, Interface- und Trait-Dateien automatisch mit dem konventionellen Autoloader geladen werden können, müssen sie einem vorgegebenen Namensschema folgen. Blöderweise verletzt das Schema eine Regel im WordPress-Standard: "Filenames should be all lowercase with hyphens as word separators."
+
+Dateinamen, die dem PSR-4-Standard folgen, werden von CodeSniffer korrekt angekreidet, wenn WordPress (wie oben) als Standard festgelegt wird. In vielen WordPress-Projekten ist die Anzahl der zu importierenden Dateien wahrscheinlich überschaubar. Wer dennoch in dieser einen Hinsicht vom WordPress-Standard abweichen möchte, kann ein eigenes CodeSniffer-Ruleset definieren, das beide Standards umfasst.
+
+Die verantwortliche Regel findet sich in `$HOME/.config/composer/vendor/wp-coding-standards/wpcs/WordPress-Core/ruleset.xml`:
+```xml
+<!-- Covers rule: Files should be named descriptively using lowercase letters.
+     Hyphens should separate words. -->
+<!-- Covers rule: Class file names should be based on the class name with "class-"
+     prepended and the underscores in the class name replaced with hyphens. -->
+<!-- Covers rule: Files containing template tags in wp-includes should have "-template"
+     appended to the end of the name. -->
+<rule ref="WordPress.Files.FileName"/>
+```
+Die beiden ersten Kommentare sprechen über genau die Aspekte, die wir deaktivieren möchten. Dazu wird dem Kommando eine weitere Option hinzugefügt:
+```bash
+phpcs --standard=wordpress --exclude=WordPress.Files.FileName <path>
+```
+Wenn dieser Standard in Neovim verwendet werden soll, muss die obige Konfiguration natürlich entsprechend angepasst werden.
 
 <!-- ## Treesitter: Verbessertes Syntax-Highlighting -->
 
