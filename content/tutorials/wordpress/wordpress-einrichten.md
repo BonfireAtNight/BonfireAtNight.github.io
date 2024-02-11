@@ -23,7 +23,16 @@ wget https://wordpress.org/latest.tar.gz
 tar xvzf latest.tar.gz
 ```
 
-Für eine bessere Sicherheit empfiehlt es sich gegebenenfalls, einige Anpassungen bei den Rechten des Verzeichnisses vorzunehmen. Auf der offiziellen WordPress-Seite wird ein Schema [vorgeschlagen](https://wordpress.org/documentation/article/hardening-wordpress/#file-permissions){: target="_blank"}
+Für eine bessere Sicherheit empfiehlt es sich gegebenenfalls, einige Anpassungen bei den Rechten des Verzeichnisses vorzunehmen. Auf der offiziellen WordPress-Seite wird ein Schema [vorgeschlagen](https://wordpress.org/documentation/article/hardening-wordpress/#file-permissions){: target="_blank"}.
+
+Auch aus praktischen Gründen wird man die Zugangsrechte festlegen wollen. Ohne die passenden Leserechte wird der Server eine Fehlermeldung ausgeben, wenn man versucht, die Seite aufzurufen. Und selbst wenn man die Seite aufrufen und sogar viele Dinge im WordPress-Adminbereich tun kann, sind Funktionalitäten wie Updates und die Installation von Plugins gegebenenfalls beschränkt. Statt einer Fehlermeldung auszugeben, fragt WordPress dann nach FTP-Zugangsdaten; ein etwas irreführendes Verhalten, insbesondere wenn der FTP-Dienst für Apache gar nicht konfiguriert wurde.
+
+Wie die offizielle Website empfiehlt, können wir `755` für Verzeichnisse und `644` für Dateien anwenden. Damit erhält der Eigentümer Lese-, Schreib- und Ausführungsrechte für Verzeichnisse und Lese- und Schreibrechte für Dateien; andere erhalten Lese- und Ausführungsrechte für Verzeichnisse und (nur) Leserechte für Dateien. Als Eigentümer empfehlen sich der Apache-Benuzer und -Gruppe, in Arch-basierten Systemen für beide standardmäßig `http`. Die Rechte und Eigentümerschaft werden dann folgendermaßen vergeben:
+```bash
+sudo chown -R http:http /srv/http/my-wordpress-site # assign user and group to directory
+sudo find /srv/http/my-wordpress-site -type d -exec chmod 755 {} \; # directory permissions
+sudo find /srv/http/my-wordpress-site -type f -exec chmod 644 {} \; # file permissions
+```
 
 ## PHP
 PHP wird Server-seitig ausgeführt. Da der Entwicklungscomputer beim Localhost selbst der Server ist, muss PHP darauf installiert sein. Das Paket ist in den offiziellen Paket-Repositories verfügbar. Ich meine mich zu erinnern, dass in einigen Fällen auch `gd` notwendig wird, weshalb es vielleicht nicht schadet, das kleine Paket direkt mitzuinstallieren.
