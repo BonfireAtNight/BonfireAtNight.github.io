@@ -27,9 +27,11 @@ Für eine bessere Sicherheit empfiehlt es sich gegebenenfalls, einige Anpassunge
 
 Auch aus praktischen Gründen wird man die Zugangsrechte festlegen wollen. Ohne die passenden Leserechte wird der Server eine Fehlermeldung ausgeben, wenn man versucht, die Seite aufzurufen. Und selbst wenn man die Seite aufrufen und sogar viele Dinge im WordPress-Adminbereich tun kann, sind Funktionalitäten wie Updates und die Installation von Plugins gegebenenfalls beschränkt. Statt einer Fehlermeldung auszugeben, fragt WordPress dann nach FTP-Zugangsdaten; ein etwas irreführendes Verhalten, insbesondere wenn der FTP-Dienst für Apache gar nicht konfiguriert wurde.
 
-Wie die offizielle Website empfiehlt, können wir `755` für Verzeichnisse und `644` für Dateien anwenden. Damit erhält der Eigentümer Lese-, Schreib- und Ausführungsrechte für Verzeichnisse und Lese- und Schreibrechte für Dateien; andere erhalten Lese- und Ausführungsrechte für Verzeichnisse und (nur) Leserechte für Dateien. Als Eigentümer empfehlen sich der Apache-Benuzer und -Gruppe, in Arch-basierten Systemen für beide standardmäßig `http`. Die Rechte und Eigentümerschaft werden dann folgendermaßen vergeben:
+Wie die offizielle Website empfiehlt, können wir `755` für Verzeichnisse und `644` für Dateien anwenden. Damit erhält der Eigentümer Lese-, Schreib- und Ausführungsrechte für Verzeichnisse und Lese- und Schreibrechte für Dateien; andere erhalten Lese- und Ausführungsrechte für Verzeichnisse und (nur) Leserechte für Dateien. Als Eigentümer empfiehlt sich der mit Apache verbundene Benutzer, standardmäßig `http` (der Gruppe `http`).[^apache-user]
+
+Die Rechte und Eigentümerschaft werden dann folgendermaßen vergeben:
 ```bash
-sudo chown -R http:http /srv/http/my-wordpress-site # assign user and group to directory
+sudo chown -R http:http /srv/http/my-wordpress-site # assign user and group
 sudo find /srv/http/my-wordpress-site -type d -exec chmod 755 {} \; # directory permissions
 sudo find /srv/http/my-wordpress-site -type f -exec chmod 644 {} \; # file permissions
 ```
@@ -218,3 +220,4 @@ chmod o+rx /home/kai
 ## Fußnoten
 [^apache-document-root]: Falls gewünscht kann das Verzeichnis in der Apache-Konfigurationsdatei durch die Einstellung `DocumentRoot <Verzeichnis>"`geändert werden. Das Arch-Wiki warnt jedoch, dass daraufhin weitere Einstellungen notwendig werden.
 [^libphp]: Ich nutze hier der Einfachheit halber `libphp`. Falls Performance eine Rolle spielt, sollten stattdessen `apache2-mpm-worker` und `mod_fcgid` eingebunden werden. Letzteres ist im AUR verfügbar. Für weitere Erklärungen, siehe den Abschnitt im [Arch Wiki](https://wiki.archlinux.org/title/Apache_HTTP_Server#PHP){: target="_blank"}
+[^apache-user]: Es kann sein, dass der Benutzer erst nach der Installation von Apache existiert.
