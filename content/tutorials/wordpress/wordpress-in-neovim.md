@@ -40,12 +40,18 @@ Einige Pakete erwarten, über Composer installierte Anwendungen direkt aufrufen 
 export PATH="$PATH:$HOME/.config/composer/vendor/bin"
 ```
 
-Über Composer können wir nun auch die für WordPress benötigten PHP-Stubs installieren. Wir könnten sie individuell als Projekt-Dependencies anfordern, indem wir sie der `composer.json` hinzufügen. Der Einfachheit halber installiere ich sie aber global:
+Über Composer können wir nun auch die für WordPress benötigten PHP-Stubs installieren. Es empfiehlt sich, sie lokal als Projekt-Dependencies anzufordern. Entweder, indem wir sie manuell der `composer.json` hinzufügen oder (einfacher) über das `composer`-CLI. Die meisten Benutzer werden nur einige wenige Stubs benötigen: PHP 8 Support allgemein, WordPress-Core, WordPress-Globals und vielleicht noch Woocommerce und die WordPress-Testumgebung.[^weitere-stubs]
 ```bash
-composer global require php-stubs/wordpress-globals php-stubs/wordpress-stubs php-stubs/woocommerce-stubs php-stubs/acf-pro-stubs wpsyntex/polylang-stubs php-stubs/genesis-stubs php-stubs/wp-cli-stubs
+composer require --dev phpstan/php-8-stubs
+composer require --dev php-stubs/wordpress-stubs
+composer require --dev php-stubs/wordpress-globals
+composer require --dev php-stubs/wordpress-tests-stubs
+composer require --dev php-stubs/woocommerce-stubs
 ```
-
-Davon werden die meisten Benutzer nur einige wenige benötigen: WordPress-Core, WordPress-Globals und vielleicht noch Woocommerce. Es ist aber vielleicht interessant zu wissen, dass es Stubs auch für andere populäre Plugins gibt.
+Alternativ können die Stubs mit dem `global` Schlüsselwort auch systemweit installiert werden.
+```bash
+composer global require phpstan/php-8-stubs php-stubs/wordpress-globals php-stubs/wordpress-stubs php-stubs/wordpress-tests-stubs php-stubs/woocommerce-stubs
+```
 
 Schließlich brauchen wir Composer noch aus einem anderen Grund. Intelephense wird sich nur dann mit unserem Code-Buffer verbinden, wenn es das Wurzelverzeichnis des Projekts identifizieren kann, zu dem die geöffnete Datei gehört. Dazu wird ein Elternverzeichnis gesucht, in der sich eine `composer.json` befindet. Für kleinere Projekte ohne nennenswerte Dependencies kann die Konfiguration sehr spartanisch sein. Für ernsthaftere Projekte kann über `composer init` ein Setup-Assistent gestartet werden.
 
@@ -239,3 +245,4 @@ Im Rahmen von WordPress wird leider weitaus mehr Schrott produziert. Bessere Wer
 [^core]: Wenn man für den WordPress Core entwickeln möchte, dann *müssen* die Regeln eingehalten werden.
 [^in-place]: Anders als bei ähnlichen Anwendungen wird die korrigierte Fassung nicht nur auf der Standardausgabe ausgegeben; die Zieldatei selbst wird angepast. Für eine bloße Ausgabe kann ein sogenannter Dry-Run durchgeführt werden: `phpcbf --dry-run path/to/your/directory`.
 [^direkte-verwendung]: Wenn `/vendor/bin/` dem `PATH` hinzugefügt wurde, dann können `phpcs` und `phpcbf` direkt (ohne Pfadangabe) aufgerufen werden.
+[^weitere-stubs]: Es ist vielleicht interessant zu wissen, dass es Stubs auch für andere populäre Plugins und Anwendungen gibt. Dazu gehören: `php-stubs/acf-pro-stubs`, `wpsyntex/polylang-stubs`, `php-stubs/genesis-stubs` oder `php-stubs/wp-cli-stubs`.
