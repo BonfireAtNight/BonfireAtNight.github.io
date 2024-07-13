@@ -49,7 +49,7 @@ TSInstall blade
 (keyword) @function
 ```
 
-3. Durch Tree-sitters [Language Injection](https://tree-sitter.github.io/tree-sitter/syntax-highlighting#language-injection){target="_blank"} Feature wird festgelegt, dass auch der PHP-Code in den gleichen Dateien berücksichtigt wird. Ansonsten würden nur Blades eigenen Symbole und Directives eingefärbt. Dazu wird `~/.config/nvim/after/queries/blade/injections.scm` mit folgendem Inhalt erstellt:[^injections]
+3. Durch Tree-sitters [Language Injection](https://tree-sitter.github.io/tree-sitter/syntax-highlighting#language-injection){:target="_blank"}-Feature wird festgelegt, dass auch der PHP-Code in den gleichen Dateien berücksichtigt wird. Ansonsten würden nur Blades eigenen Symbole und Directives eingefärbt. Dazu wird `~/.config/nvim/after/queries/blade/injections.scm` mit folgendem Inhalt erstellt:[^injections]
 
 ```Query
 ((text) @injection.content
