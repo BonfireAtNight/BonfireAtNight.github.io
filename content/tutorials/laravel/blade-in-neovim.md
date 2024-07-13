@@ -1,7 +1,7 @@
 # Blade in Neovim
 [Blade](https://laravel.com/docs/11.x/blade){:target="_blank"} ist Laravels hauseigene Template-Sprache. Sie wird nicht von Neovim ohne Weiteres unterstützt. Besonders frustrierend: Wenn man die entsprechenden Dateien öffnet, bleibt Syntax-Highlighting ausgeschaltet. Nicht nur für Blade selbst - auch für PHP und HTML.
 
-Die Arbeit ohne farbliche Hervorhebungen ist heutzeutage unzumutbar, deshalb wollen wir zunächst das Syntax-Highlighting zum Laufen bringen. Im Anschluss daran wird (gewissermaßen als Bonus) gezeigt, wie sich Blade-Code mithilfe von [conform.nvim](https://github.com/stevearc/conform.nvim){:target="_blank} autoformatieren lässt.
+Die Arbeit ohne farbliche Hervorhebungen ist heutzeutage unzumutbar, deshalb wollen wir zunächst das Syntax-Highlighting zum Laufen bringen. Im Anschluss daran wird (gewissermaßen als Bonus) gezeigt, wie sich Blade-Code mithilfe von [conform.nvim](https://github.com/stevearc/conform.nvim){:target="_blank} formatieren lässt.
 
 Ich folge hier zwei Anleitungen, die sich im Grunde leicht finden lassen, aber bei denen man vielleicht leicht etwas übersieht. Für die Tree-sitter-Grammatik ein [GitHub-Issue](https://github.com/EmranMR/tree-sitter-blade/discussions/19){:target="_blank"} und für die Autoformatierung [@jogarcias Anleitung](https://medium.com/@jogarcia/laravel-blade-on-neovim-ee530ff5d20d){:target="_blank"}.
 
@@ -29,6 +29,10 @@ vim.filetype.add({
     },
 })
 ```
+Nun muss die Grammatik noch installiert werden:
+```
+TSInstall blade
+```
 2. Um Syntax-Highlighting zu ermöglichen, muss `~/.config/nvim/after/queries/blade/highlights.scm` mit folgendem Inhalt erstellt werden:
 ```Query
 (directive) @function
@@ -48,6 +52,21 @@ vim.filetype.add({
     (#not-has-ancestor? @injection.content "envoy")
     (#set! injection.combined)
     (#set! injection.language php))
+```
+
+## Code-Formatting
+[Blade-formatter](https://github.com/shufo/blade-formatter){:target="_blank"} dient der automatischen Formatierung. Um es (global) zu installieren, kann NPM genutzt werden:
+```bash
+sudo npm install -g blade-formatter
+```
+
+Um das Tool für die Formatierung anzuwenden, wird es der Conform-Konfiguration hinzugefügt:
+```lua
+require("conform").setup({
+  formatters_by_ft = {
+    blade = { "blade-formatter" }, -- run `sudo npm install -g blade-formatter`
+  },
+})
 ```
 
 [^injections]: In der entsprechenden [Datei auf GitHub](https://github.com/EmranMR/tree-sitter-blade/blob/main/queries/injections.scm){:target="_blank"} finden sich weitere Injections. Diese könnten in einigen Fällen notwendig sein.
