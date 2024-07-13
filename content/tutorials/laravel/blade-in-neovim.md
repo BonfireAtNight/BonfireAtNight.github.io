@@ -1,5 +1,5 @@
 # Blade in Neovim
-[Blade](https://laravel.com/docs/11.x/blade){:target="_blank"} ist Laravels hauseigene Template-Sprache. Sie wird nicht von Neovim ohne Weiteres unterstützt. Besonders frustrierend: Wenn man die entsprechenden Dateien öffnet, bleibt Syntax-Highlighting ausgeschaltet. Nicht nur für Blade selbst - auch für PHP und HTML.
+[Blade](https://laravel.com/docs/11.x/blade){:target="_blank"} ist Laravels hauseigene Template-Sprache. Sie wird von Neovim nicht ohne Weiteres unterstützt. Besonders frustrierend: Wenn man die entsprechenden Dateien öffnet, bleibt Syntax-Highlighting ausgeschaltet. Nicht nur für Blade selbst - auch für PHP und HTML.
 
 Die Arbeit ohne farbliche Hervorhebungen ist heutzeutage unzumutbar, deshalb wollen wir zunächst das Syntax-Highlighting zum Laufen bringen. Im Anschluss daran wird (gewissermaßen als Bonus) gezeigt, wie sich Blade-Code mithilfe von [conform.nvim](https://github.com/stevearc/conform.nvim){:target="_blank} formatieren lässt.
 
