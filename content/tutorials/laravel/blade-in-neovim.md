@@ -9,6 +9,7 @@ Ich folge hier zwei Anleitungen, die sich im Grunde leicht finden lassen, aber b
 Viele Features von Neovim stützen sich auf Parsing durch [Tree-sitter](https://github.com/tree-sitter/tree-sitter){:target="_blank}. Blade ist leider nicht Teil der Sprachen, die sich einfach durch `TSInstall X` installieren lassen. @EmranMR hat jedoch eine [Grammatik](https://github.com/EmranMR/tree-sitter-blade/tree/main){:target="_blank"} geschrieben, die wir Tree-sitter manuell hinzufügen können. Dazu müssen wir mehrere Dinge tun.
 
 1. Zunächst müssen wir der Tree-sitter-Konfiguration die Grammatik hinzufügen. Vermutlich haben die meisten Nutzer bereits eine `require'nvim-treesitter.configs'.setup{...}`-Konfiguration; neue Grammatiken werden mit `require "nvim-treesitter.parsers".get_parser_configs()` hinzugefügt.
+
 ```lua
 require'nvim-treesitter.configs'.setup{...}
 
@@ -33,7 +34,9 @@ Nun muss die Grammatik noch installiert werden:
 ```
 TSInstall blade
 ```
+
 2. Um Syntax-Highlighting zu ermöglichen, muss `~/.config/nvim/after/queries/blade/highlights.scm` mit folgendem Inhalt erstellt werden:
+
 ```Query
 (directive) @function
 (directive_start) @function
@@ -47,6 +50,7 @@ TSInstall blade
 ```
 
 3. Durch Tree-sitters [Language Injection](https://tree-sitter.github.io/tree-sitter/syntax-highlighting#language-injection){target="_blank"}-Feature wird festgelegt, dass auch der PHP-Code in den gleichen Dateien berücksichtigt wird. Ansonsten würden nur Blades eigenen Symbole und Directives eingefärbt. Dazu wird `~/.config/nvim/after/queries/blade/injections.scm` mit folgendem Inhalt erstellt:[^injections]
+
 ```Query
 ((text) @injection.content
     (#not-has-ancestor? @injection.content "envoy")
@@ -56,11 +60,13 @@ TSInstall blade
 
 ## Code-Formatting
 [Blade-formatter](https://github.com/shufo/blade-formatter){:target="_blank"} dient der automatischen Formatierung. Um es (global) zu installieren, kann NPM genutzt werden:
+
 ```bash
 sudo npm install -g blade-formatter
 ```
 
 Um das Tool für die Formatierung anzuwenden, wird es der Conform-Konfiguration hinzugefügt:
+
 ```lua
 require("conform").setup({
   formatters_by_ft = {
