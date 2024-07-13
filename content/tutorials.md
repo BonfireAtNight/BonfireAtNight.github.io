@@ -22,4 +22,4 @@ date_last_mod: 2023-09-23 10:17:00 +0200
 - [**Neovim für WordPress**]({% link content/tutorials/wordpress/wordpress-in-neovim.md %})
 
 ## Laravel
-- [**Blade in Neovim**]($ link content/tutorials/laravel/blade-in-neovim.md $})
+- [**Blade in Neovim**](% link content/tutorials/laravel/blade-in-neovim.md %})
